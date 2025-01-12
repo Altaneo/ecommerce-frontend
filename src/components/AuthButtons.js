@@ -38,7 +38,7 @@ const useStyles = makeStyles({
   },
 });
 
-const AuthButtons = (onVerificationComplete) => {
+const AuthButtons = ({onClose}) => {
   const classes = useStyles();
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
@@ -53,6 +53,7 @@ const AuthButtons = (onVerificationComplete) => {
       if (response.data.success) {
         console.log('Google Login Success:', response.data.user);
         alert('Login successful!');
+        onClose()
       } else {
         alert('Login failed.');
       }
@@ -71,7 +72,7 @@ const AuthButtons = (onVerificationComplete) => {
       >
         Login with Google
       </Button>
-      <SignInButton onVerificationComplete={onVerificationComplete} />
+      <SignInButton onClose={onClose}/>
     </div>
   );
 };

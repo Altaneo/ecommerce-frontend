@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 
-const SignInButton = ({ onVerificationComplete }) => {
+const SignInButton = ({onClose}) => {
     useEffect(() => {
         // Load the external script
         const script = document.createElement('script');
@@ -20,10 +20,8 @@ const SignInButton = ({ onVerificationComplete }) => {
                     { user_json_url: userJsonUrl,user_json_phone:phone },
                     { withCredentials: true } // Send cookies with the request
                 );
-
-                // Call the grandparent's callback to close the modal
-                onVerificationComplete();
                 console.log('Verification Successful:', res.data);
+                onClose()
             } catch (err) {
                 console.error('Error during verification:', err.message);
             }
@@ -33,7 +31,7 @@ const SignInButton = ({ onVerificationComplete }) => {
             // Cleanup the listener function when the component unmounts
             window.phoneEmailListener = null;
         };
-    }, [onVerificationComplete]);
+    }, []);
 
     return (
         <div>

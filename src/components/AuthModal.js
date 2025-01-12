@@ -211,7 +211,7 @@ function AuthModal({ open, onClose, authType }) {
       </IconButton>
       <Typography className={classes.dialogTitle}>Welcome to Altaneofin</Typography>
       <DialogContent className={classes.dialogContent}>
-        <AuthButtons  onVerificationComplete={onClose} />
+        <AuthButtons onClose={onClose} />
         <TextField
           label="Enter Email"
           variant="outlined"
