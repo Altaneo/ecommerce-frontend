@@ -9,7 +9,6 @@ import {
   Menu,
   MenuItem,
   TextField,
-  InputAdornment,
   Drawer,
   List,
   ListItem,
@@ -125,35 +124,31 @@ function Navbar() {
           </Typography>
           {/* Search Bar */}
           <form
-            onSubmit={handleSearchSubmit}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              flexGrow: 2,
-              justifyContent: 'center',
-            }}
-          >
-            <TextField
-              variant="outlined"
-              size="small"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                bgcolor: 'white',
-                borderRadius: 1,
-                minWidth: { xs: '200px', sm: '300px' },
-              }}
-            />
-              <Button type="submit" color="inherit">Search</Button>
-          </form>
+      onSubmit={handleSearchSubmit}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        flexGrow: 2,
+        justifyContent: 'center',
+      }}
+    >
+      <TextField
+        variant="outlined"
+        size="small"
+        placeholder="Search..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+        sx={{
+          bgcolor: 'white',
+          borderRadius: 1,
+          minWidth: { xs: '200px', sm: '300px' },
+        }}
+      />
+      {/* Replace the Button with IconButton */}
+      <IconButton type="submit" sx={{ color: 'white' }} aria-label="search">
+        <SearchIcon />
+      </IconButton>
+    </form>
           {/* Links and Icons */}
           <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 2 }}>
             <Button component={Link} to="/home" color="inherit">

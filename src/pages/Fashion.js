@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProductFilter from '../components/ProductLists';
+import { formatCategories } from '../utils/comman';
 
 function Fashion() {
   const [products, setProducts] = useState([]); // State to store the products
@@ -34,9 +35,9 @@ function Fashion() {
   const fashionProducts = products.filter((product) => product.category === 'fashion');
 
   // Define the categories array to pass as props
-  const categories = ['jacket', 'jeans', 'tshirt', 'shirt', 'hat'];
-
-  return <ProductFilter products={fashionProducts} categories={categories} />;
+  const categories = ['jacket', 'jeans', 'tshirt', 'shirt', 'hat','scarf','sweater','sunGlasses'];
+   const formattedCategory = formatCategories(categories)
+  return <ProductFilter products={fashionProducts} categories={formattedCategory} />;
 }
 
 export default Fashion;

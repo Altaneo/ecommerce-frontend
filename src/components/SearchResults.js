@@ -9,6 +9,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import ProductFilter from './ProductLists';
+import { formatCategories } from '../utils/comman';
 
 // Styles
 const useStyles = makeStyles({
@@ -122,7 +123,8 @@ function SearchResults() {
     }));
   };
   const categories = ['phone', 'watch', 'laptop', 'tv','jacket', 'jeans', 'tshirt', 'shirt', 'hat','sofa', 'table', 'chair', 'bed', 'cupboard'];
-  return <ProductFilter products={filteredProducts} categories={categories}/>;
+   const formattedCategory = formatCategories(categories)
+  return <ProductFilter products={filteredProducts} categories={formattedCategory}/>;
 }
 
 export default SearchResults;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProductFilter from '../components/ProductLists';
+import { formatCategories } from '../utils/comman';
 
 function Electronics() {
   const [products, setProducts] = useState([]); // State to store the products
@@ -34,9 +35,9 @@ function Electronics() {
   const electronicsProduct = products.filter((product) => product.category === 'electronics');
 
   // Define the categories array to pass as props
-  const categories = ['phone', 'watch', 'laptop', 'tv'];
-
-  return <ProductFilter products={electronicsProduct} categories={categories} />;
+  const categories = ['phone', 'watch', 'laptop', 'tv','soundSystem','tablet','game'];
+ const formattedCategory = formatCategories(categories)
+  return <ProductFilter products={electronicsProduct} categories={formattedCategory} />;
 }
 
 export default Electronics;

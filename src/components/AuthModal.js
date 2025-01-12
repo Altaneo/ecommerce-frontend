@@ -43,11 +43,22 @@ const useStyles = makeStyles({
     marginBottom: '1rem',
   },
   continueButton: {
-    textTransform: 'none',
-    border: '1px solid #1976d2',
-    color: '#1976d2',
-    '&:hover': {
-      backgroundColor: '#e3f2fd',
+    width: "100%",
+    padding: "10px",
+    backgroundColor: "#1976d2",
+    color: "white",
+    border: "none",
+    marginTop: "10px",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "14px",
+    textAlign: "center",
+    "&:hover": {
+      backgroundColor: "#394bc",
+    },
+    "&:disabled": {
+      backgroundColor: "#ddd",
+      cursor: "not-allowed",
     },
   },
   otpError: {
@@ -60,10 +71,22 @@ const useStyles = makeStyles({
     marginBottom: '1rem',
   },
   sendOtpButton: {
-    backgroundColor: '#388e3c',
-    color: '#fff',
-    '&:hover': {
-      backgroundColor: '#2e7d32',
+    width: "100%",
+    padding: "10px",
+    backgroundColor: "#1976d2",
+    color: "white",
+    border: "none",
+    marginTop: "10px",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "14px",
+    textAlign: "center",
+    "&:hover": {
+      backgroundColor: "#394bc",
+    },
+    "&:disabled": {
+      backgroundColor: "#ddd",
+      cursor: "not-allowed",
     },
   },
 });
@@ -248,13 +271,13 @@ function AuthModal({ open, onClose, authType }) {
               onChange={handleUserInfoChange}
               name="address"
             />
-            <Button
+            <button
               onClick={handleSaveUserAndSendOtp}
               fullWidth
               className={classes.sendOtpButton}
             >
               Send OTP
-            </Button>
+            </button>
           </>
         )}
 
@@ -271,9 +294,10 @@ function AuthModal({ open, onClose, authType }) {
             {otpError && <Typography className={classes.otpError}>{otpError}</Typography>}
           </>
         )}
-        <Button onClick={handleSubmit} fullWidth className={classes.continueButton}>
+        
+        <button onClick={handleSubmit} fullWidth className={classes.continueButton}>
           Continue
-        </Button>
+        </button>
       </DialogContent>
     </Dialog>
   );

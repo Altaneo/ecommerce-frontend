@@ -9,6 +9,7 @@ import Fashion from './pages/Fashion';
 import Electronics from './pages/Electronics';
 import CartPage from './pages/CartPage';
 import SearchResults from '../src/components/SearchResults'; 
+import Footer from './components/Footer';
 function App() {
   return (
     <Router>
@@ -23,6 +24,7 @@ function App() {
         <Route path="/cart" element={<CartPage/>} />
         <Route path="/search" element={<SearchResults />} />
       </Routes>
+      <Footer/>
     </Router>
   );
 }

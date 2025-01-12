@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { makeStyles } from '@mui/styles';
-import Footer from '../components/Footer';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -234,7 +233,6 @@ function LandingPage() {
           )}
         </div>
       </header>
-      <Footer/>
     </div>
   );
 }

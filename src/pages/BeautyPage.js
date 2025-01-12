@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProductFilter from '../components/ProductLists';
+import { formatCategories } from '../utils/comman';
 
 function BeautyPage() {
   const [products, setProducts] = useState([]); // State to store the products
@@ -35,8 +36,8 @@ function BeautyPage() {
 
   // Define the categories array to pass as props
   const categories = ['makeup', 'cream', 'hairdryer', 'shampoo'];
-
-  return <ProductFilter products={beautyProducts} categories={categories} />;
+  const formattedCategory = formatCategories(categories)
+  return <ProductFilter products={beautyProducts} categories={formattedCategory} />;
 }
 
 export default BeautyPage;
