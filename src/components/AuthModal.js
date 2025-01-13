@@ -109,25 +109,55 @@ function AuthModal({ open, onClose, authType }) {
   const [isUserInfoVisible, setIsUserInfoVisible] = useState(false);
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
   const isPhone = (value) => /^[0-9]{10}$/.test(value);
-  const isEmail = (value) => /\S+@\S+\.\S+/.test(value);
-  
+
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Helper function to validate email
+    const validateEmail = (email) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+  
+    // Helper function to validate phone (example: basic 10-digit number)
+    const validatePhone = (phone) => {
+      const phoneRegex = /^\d{10}$/;
+      return phoneRegex.test(phone);
+    };
+  
+    // Validate emailOrPhone input
+    if (!emailOrPhone) {
+      alert('Email or phone number is required.');
+      return;
+    }
+  
+    if (!validateEmail(emailOrPhone) && !validatePhone(emailOrPhone)) {
+      alert('Please enter a valid email or phone number.');
+      return;
+    }
+  
+    // OTP validation if OTP is already sent
+    if (isOtpSent && (!otp || otp.length !== 6)) {
+      setOtpError('Please enter a valid 6-digit OTP.');
+      return;
+    }
+  
+    // Proceed with API requests
     if (!isOtpSent) {
       try {
         const userCheckResponse = await axios.post(
           `${apiBaseUrl}/api/auth/check-user`,
           { emailOrPhone }
         );
-
+  
         if (userCheckResponse.data.exists) {
           setUserExists(true);
           const otpResponse = await axios.post(`${apiBaseUrl}/api/auth/send-otp`, {
             emailOrPhone,
-            isPhone: isPhone(emailOrPhone),
+            isPhone: validatePhone(emailOrPhone),
           });
-
+  
           if (otpResponse.status === 200) {
             setIsOtpSent(true);
           } else {
@@ -147,7 +177,7 @@ function AuthModal({ open, onClose, authType }) {
           emailOrPhone,
           otp,
         });
-
+  
         if (response.data.success) {
           console.log(`${authType} successful!`);
           onClose();
@@ -160,6 +190,7 @@ function AuthModal({ open, onClose, authType }) {
       }
     }
   };
+  
 
   const handleUserInfoChange = (e) => {
     const { name, value } = e.target;
@@ -174,7 +205,7 @@ function AuthModal({ open, onClose, authType }) {
       const userInfoData = {
         name: userInfo.name,
         gender: userInfo.gender,
-        email: userInfo.email,
+        email: emailOrPhone,
         inviteCode: userInfo.inviteCode,
         address: userInfo.address,
         phone: emailOrPhone,
@@ -245,14 +276,20 @@ function AuthModal({ open, onClose, authType }) {
               </RadioGroup>
             </FormControl>
             <TextField
-              label="Email"
-              variant="outlined"
-              fullWidth
-              className={classes.inputField}
-              value={userInfo.email}
-              onChange={handleUserInfoChange}
-              name="email"
-            />
+  label="Phone Number"
+  variant="outlined"
+  fullWidth
+  className={classes.inputField}
+  value={userInfo.phone} // Use the appropriate state property for phone
+  onChange={handleUserInfoChange}
+  name="phone" // Update name to match phone
+  type="tel" // Set input type to "tel" for numeric keypad on mobile
+  inputProps={{
+    maxLength: 10, // Optional: Restrict to 10 digits
+    pattern: "[0-9]*", // Restrict input to numbers only
+  }}
+  helperText="Enter a valid 10-digit phone number."
+/>
             <TextField
               label="Invite Code"
               variant="outlined"
