@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { formatCategories } from '../utils/comman';
 
 // Define the styles using makeStyles
 const useStyles = makeStyles((theme) => ({
@@ -58,6 +59,13 @@ const useStyles = makeStyles((theme) => ({
     height: '200px',
     borderRadius: '8px',
     border: 'none',
+  },
+  cardHeader: {
+    backgroundColor: '#007bff', // Blue background
+    color: 'white', // White text
+    padding: '10px 15px',
+    fontSize: '1.25rem',
+    borderRadius: '5px 5px 0 0', // Rounded corners at the top
   },
   button: {
     marginTop: '10px',
@@ -190,6 +198,9 @@ function LandingPage() {
   {liveStreams.length > 0 ? (
     liveStreams.map((stream) => (
       <div key={stream.id} className={classes.item}>
+         <div className={classes.cardHeader}>
+         Live Status: {formatCategories([stream.snippet.liveBroadcastContent])}
+      </div>
         <h3>{stream.snippet.title}</h3>
         <p>{stream.snippet.description}</p>
         <p>Start Time: {new Date(stream.snippet.publishTime).toLocaleString()}</p>
