@@ -36,8 +36,8 @@ function Fashion() {
 
   // Define the categories array to pass as props
   const categories = ['jacket', 'jeans', 'tshirt', 'shirt', 'hat','scarf','sweater','sunGlasses'];
-   const formattedCategory = formatCategories(categories)
-  return <ProductFilter products={fashionProducts} categories={formattedCategory} />;
+ 
+  return <ProductFilter products={fashionProducts} categories={categories} />;
 }
 
 export default Fashion;

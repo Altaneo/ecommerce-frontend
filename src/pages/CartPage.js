@@ -4,7 +4,6 @@ import axios from 'axios';
 import { Button, Typography, Box, IconButton, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AuthModal from '../components/AuthModal';
-import ProfileModal from '../components/ProfileModal';
 import RazorpayCheckout from '../components/RazorpayCheckout';
 
 const useStyles = makeStyles({
@@ -275,11 +274,6 @@ function CartPage() {
                 Place Order with Cash on Delivery
               </button>
             )}
-            {isAuthenticated && !deliveryAddress && (
-          <button className={classes.placeOrderButton} onClick={() => setProfileModalOpen(true)}>
-            Add New Delivery Address
-          </button>
-        )}
           </Box>
         )}
       </div>
@@ -306,7 +300,6 @@ function CartPage() {
         </Typography>
       </div>
       <AuthModal open={modalOpen} onClose={handleCloseModal} authType={authType} />
-      <ProfileModal open={profileModalOpen} onClose={handleCloseProfileModal} />
     </div>
   );
 }

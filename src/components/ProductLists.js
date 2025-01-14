@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Range } from 'react-range';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
+import { formatCategories } from '../utils/comman';
 
 // Styles
 const useStyles = makeStyles({
@@ -81,6 +82,7 @@ function ProductFilter({ products, categories }) {
   });
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
   const filteredProducts = products.filter((product) => {
+ 
     const categoryMatch =
       filters.category.length === 0 || filters.category.includes(product.type);
     const priceMatch =
@@ -88,6 +90,7 @@ function ProductFilter({ products, categories }) {
     const ratingMatch =
       !filters.rating || product.rating >= parseInt(filters.rating, 10);
     return categoryMatch && priceMatch && ratingMatch;
+    
   });
 
   const handleAddToCart = async (product) => {
@@ -107,7 +110,6 @@ function ProductFilter({ products, categories }) {
       alert('Failed to add product to cart');
     }
   };
-
   return (
     <div className={classes.container}>
      
@@ -129,7 +131,7 @@ function ProductFilter({ products, categories }) {
                 checked={filters.category.includes(category)}
                 readOnly
               />
-              <label>{category}</label>
+           <label>{formatCategories(category)}</label> 
             </div>
           ))}
         </div>

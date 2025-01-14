@@ -2,19 +2,18 @@ import React from 'react';
 import {
   signInWithPopup,
 } from 'firebase/auth';
-import { auth, googleProvider } from './firebaseConfig';
+import { auth, googleProvider,facebookProvider } from './firebaseConfig';
 import axios from 'axios';
 import { FcGoogle } from 'react-icons/fc';
 import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SignInButton from './PhoneSignUp';
-
+import FacebookIcon from '@mui/icons-material/Facebook'
 const useStyles = makeStyles({
   buttonContainer: {
     display: 'flex',
     alignItems: 'center',
     gap: '1rem',
-    marginTop: '2rem',
   },
   googleButton: {
     textTransform: 'none!important',
@@ -24,9 +23,6 @@ const useStyles = makeStyles({
     color: '#000',
     width:"225px!important",
     fontSize:"14px!importantS",
-    '&:hover': {
-      backgroundColor: '#f7f7f7',
-    },
   },
   facebookButton: {
     textTransform: 'none',
@@ -62,7 +58,28 @@ const AuthButtons = ({onClose}) => {
       alert('Login failed.');
     }
   };
+  const handleFacebookLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, facebookProvider);
+      const idToken = await result.user.getIdToken();
+
+      // Send ID token to the backend for verification
+      const response = await axios.post(`${apiBaseUrl}/api/auth/verifyAuth-token`, { idToken });
+
+      if (response.data.success) {
+        console.log('Facebook Login Success:', response.data.user);
+        alert('Login successful!');
+        onClose();
+      } else {
+        alert('Login failed.');
+      }
+    } catch (error) {
+      console.error('Error with Facebook login:', error);
+      alert('Login failed.');
+    }
+  };
   return (
+    <>
     <div className={classes.buttonContainer}>
       <Button
         variant="outlined"
@@ -72,8 +89,19 @@ const AuthButtons = ({onClose}) => {
       >
         Login with Google
       </Button>
-      <SignInButton onClose={onClose}/>
+      <Button
+        variant="contained"
+        onClick={handleFacebookLogin}
+        startIcon={<FacebookIcon />}
+        className={classes.googleButton}
+      >
+        Login with Facebook
+      </Button>
     </div>
+    <div className={classes.buttonContainer}>
+       <SignInButton onClose={onClose}/>
+    </div>
+    </>
   );
 };
 

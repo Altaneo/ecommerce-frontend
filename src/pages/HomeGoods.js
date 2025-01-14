@@ -36,8 +36,7 @@ function HomeGoods() {
 
   // Define the categories array to pass as props
   const categories = ['sofa', 'table', 'chair', 'bed','clock', 'cupboard'];
- const formattedCategory = formatCategories(categories)
-  return <ProductFilter products={homeProducts} categories={formattedCategory} />;
+  return <ProductFilter products={homeProducts} categories={categories} />;
 }
 
 export default HomeGoods;

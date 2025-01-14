@@ -16,7 +16,6 @@ import {
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthModal from './AuthModal';
-import ProfileModal from './ProfileModal';
 import axios from 'axios';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -38,6 +37,7 @@ function Navbar() {
       const response = await axios.get(`${apiBaseUrl}/api/auth/check-auth`, {
         withCredentials: true,
       });
+      console.log(response,"-----------response")
       setIsAuthenticated(response.data.authenticated);
     } catch (error) {
       console.error('Error checking auth token:', error);
@@ -171,6 +171,9 @@ function Navbar() {
             </IconButton>
             {isAuthenticated ? (
               <>
+                 <Button component={Link} to="/profile" color="inherit">
+              Profile
+            </Button>
                 <IconButton color="inherit" onClick={handleProfileMenuOpen}>
                   <AccountCircleIcon />
                 </IconButton>
@@ -179,7 +182,6 @@ function Navbar() {
                   open={Boolean(profileMenuAnchor)}
                   onClose={handleProfileMenuClose}
                 >
-                  <MenuItem onClick={handleOpenProfileModal}>Profile</MenuItem>
                   <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
                 </Menu>
               </>
@@ -225,7 +227,6 @@ function Navbar() {
       </Drawer>
       {/* Modals */}
       <AuthModal open={modalOpen} onClose={handleCloseModal} authType={authType} />
-      <ProfileModal open={profileModalOpen} onClose={handleCloseProfileModal} />
     </>
   );
 }

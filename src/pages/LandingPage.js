@@ -119,7 +119,7 @@ function LandingPage() {
   const [liveStreams, setLiveStreams] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
-  
+
   useEffect(() => {
     const authenticateWithYouTube = async () => {
       try {
@@ -160,7 +160,7 @@ function LandingPage() {
       });
   }, [apiBaseUrl]);
 
-  
+
   const handleAddToCart = async (product) => {
     try {
       const response = await axios.post('http://localhost:5000/api/cart/add', {
@@ -178,7 +178,7 @@ function LandingPage() {
       alert('Failed to add product to cart');
     }
   };
-  console.log(liveStreams,"-----------liveStreams")
+  console.log(liveStreams, "-----------liveStreams")
   return (
     <div className={classes.landingPage}>
       <header className={classes.header}>
@@ -195,49 +195,49 @@ function LandingPage() {
         <h2 className={classes.sectionHeading}>Upcoming Live Streams</h2>
 
         <div className={classes.container}>
-  {liveStreams.length > 0 ? (
-    liveStreams.map((stream) => (
-      <div key={stream.id} className={classes.item}>
-         <div className={classes.cardHeader}>
-         Live Status: {formatCategories([stream.snippet.liveBroadcastContent])}
-      </div>
-        <h3>{stream.snippet.title}</h3>
-        <p>{stream.snippet.description}</p>
-        <p>Start Time: {new Date(stream.snippet.publishTime).toLocaleString()}</p>
-        <iframe
-          className={classes.iframe}
-          src={`https://www.youtube.com/embed/${stream.id.videoId}`}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
-      </div>
-    ))
-  ) : (
-    <p>No upcoming live streams available.</p>
-  )}
-</div>
+          {liveStreams.length > 0 ? (
+            liveStreams.map((stream) => (
+              <div key={stream.id} className={classes.item}>
+                <div className={classes.cardHeader}>
+                  Live Status: {formatCategories(stream.snippet.liveBroadcastContent)}
+                </div>
+                <h3>{stream.snippet.title}</h3>
+                <p>{stream.snippet.description}</p>
+                <p>Start Time: {new Date(stream.snippet.publishTime).toLocaleString()}</p>
+                <iframe
+                  className={classes.iframe}
+                  src={`https://www.youtube.com/embed/${stream.id.videoId}`}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            ))
+          ) : (
+            <p>No upcoming live streams available.</p>
+          )}
+        </div>
         <h2 className={classes.sectionHeading}>Featured Products</h2>
 
         <div className={classes.container}>
           {featuredProducts.length > 0 ? (
             featuredProducts.map((product) => (
               <div key={product._id} className={classes.productCard}>
-              <img
-                src={product.image}
-                alt={product.name}
-                className={classes.productImage}
-              />
-              <h3>{product.name}</h3>
-              <p>₹{product.price.toFixed(2)}</p>
-              <p>Rating: {product.rating} ★</p>
-              <button
-                className={classes.button}
-                onClick={() => handleAddToCart(product)}
-              >
-                Add to Cart
-              </button>
-            </div>
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className={classes.productImage}
+                />
+                <h3>{product.name}</h3>
+                <p>₹{product.price.toFixed(2)}</p>
+                <p>Rating: {product.rating} ★</p>
+                <button
+                  className={classes.button}
+                  onClick={() => handleAddToCart(product)}
+                >
+                  Add to Cart
+                </button>
+              </div>
             ))
           ) : (
             <p>No featured products available.</p>

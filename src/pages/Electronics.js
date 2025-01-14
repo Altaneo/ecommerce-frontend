@@ -36,8 +36,8 @@ function Electronics() {
 
   // Define the categories array to pass as props
   const categories = ['phone', 'watch', 'laptop', 'tv','soundSystem','tablet','game'];
- const formattedCategory = formatCategories(categories)
-  return <ProductFilter products={electronicsProduct} categories={formattedCategory} />;
+ 
+  return <ProductFilter products={electronicsProduct} categories={categories} />;
 }
 
 export default Electronics;

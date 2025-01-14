@@ -102,7 +102,6 @@ function AuthModal({ open, onClose, authType }) {
     gender: '',
     email: '',
     inviteCode: '',
-    address: '',
   });
   axios.defaults.withCredentials = true;
   const [userExists, setUserExists] = useState(null);
@@ -207,7 +206,6 @@ function AuthModal({ open, onClose, authType }) {
         gender: userInfo.gender,
         email: emailOrPhone,
         inviteCode: userInfo.inviteCode,
-        address: userInfo.address,
         phone: emailOrPhone,
       };
 
@@ -249,6 +247,7 @@ function AuthModal({ open, onClose, authType }) {
           fullWidth
           className={classes.inputField}
           value={emailOrPhone}
+          inputProps={{ maxLength: 10 }}
           onChange={(e) => setEmailOrPhone(e.target.value)}
         />
 
@@ -298,15 +297,6 @@ function AuthModal({ open, onClose, authType }) {
               value={userInfo.inviteCode}
               onChange={handleUserInfoChange}
               name="inviteCode"
-            />
-            <TextField
-              label="Address"
-              variant="outlined"
-              fullWidth
-              className={classes.inputField}
-              value={userInfo.address}
-              onChange={handleUserInfoChange}
-              name="address"
             />
             <button
               onClick={handleSaveUserAndSendOtp}

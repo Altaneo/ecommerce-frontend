@@ -123,8 +123,7 @@ function SearchResults() {
     }));
   };
   const categories = ['phone', 'watch', 'laptop', 'tv','jacket', 'jeans', 'tshirt', 'shirt', 'hat','sofa', 'table', 'chair', 'bed', 'cupboard'];
-   const formattedCategory = formatCategories(categories)
-  return <ProductFilter products={filteredProducts} categories={formattedCategory}/>;
+  return <ProductFilter products={filteredProducts} categories={categories}/>;
 }
 
 export default SearchResults;

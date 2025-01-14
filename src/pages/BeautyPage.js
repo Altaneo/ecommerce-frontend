@@ -36,8 +36,7 @@ function BeautyPage() {
 
   // Define the categories array to pass as props
   const categories = ['makeup', 'cream', 'hairdryer', 'shampoo'];
-  const formattedCategory = formatCategories(categories)
-  return <ProductFilter products={beautyProducts} categories={formattedCategory} />;
+  return <ProductFilter products={beautyProducts} categories={categories} />;
 }
 
 export default BeautyPage;
