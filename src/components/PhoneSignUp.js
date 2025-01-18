@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 
 const SignInButton = ({onClose}) => {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
     useEffect(() => {
         // Load the external script
         const script = document.createElement('script');
@@ -16,17 +17,15 @@ const SignInButton = ({onClose}) => {
             try {
                 // Send the user_json_url to the API
                 const res = await axios.post(
-                    'http://localhost:5000/api/auth/verify-phoneUser',
+                    `${apiBaseUrl}/api/auth/verify-phoneUser`,
                     { user_json_url: userJsonUrl,user_json_phone:phone },
                     { withCredentials: true } // Send cookies with the request
                 );
-                console.log('Verification Successful:', res.data);
                 onClose()
             } catch (err) {
                 console.error('Error during verification:', err.message);
             }
         };
-        console.log(window.phoneEmailListener,'----------userObj')
         return () => {
             // Cleanup the listener function when the component unmounts
             window.phoneEmailListener = null;
@@ -34,12 +33,23 @@ const SignInButton = ({onClose}) => {
     }, []);
 
     return (
-        <div>
-            <div
-                className="pe_signin_button"
-                data-client-id="12034696732018244242"
-            ></div>
-        </div>
+        <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '75px', // Adjust height as needed to center vertically
+          margin: '2px auto', // Adds space around the button and centers horizontally
+        }}
+      >
+        <div
+          className="pe_signin_button"
+          style={{
+            maxWidth: '300px', // Prevents button from being too wide
+          }}
+          data-client-id="12034696732018244242"
+        ></div>
+      </div>
     );
 };
 

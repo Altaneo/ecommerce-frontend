@@ -1,45 +1,36 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-import { makeStyles } from "@mui/styles";
 
-const useStyles = makeStyles({
-  button: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#1976d2",
-    color: "white",
-    border: "none",
-    marginTop: "10px",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "14px",
-    textAlign: "center",
-    "&:hover": {
-      backgroundColor: "#394bc",
-    },
-    "&:disabled": {
-      backgroundColor: "#ddd",
-      cursor: "not-allowed",
-    },
-  },
-});
-const RazorpayCheckout = ({ data, totalPrice }) => {
-  const classes = useStyles();
+const RazorpayCheckout = ({ data, totalPrice,paymentstatus }) => {
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const removeAllCartItems = async () => {
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+  const updateAllProductsStageToPaymentCompleted = async () => {
     try {
-      await axios.delete("http://localhost:5000/api/cart");
+      const updatedProductsData = data.map(item => ({
+        _id: item._id,
+        productId: item.productId,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        image: item.image,
+        rating: item.rating,
+        stage: 'PaymentCompleted', // Update stage to PaymentCompleted
+        quantity: item.quantity,
+        __v: item.__v,
+      }));
+      const updateResponse = await axios.put(`${apiBaseUrl}/api/cart/update`, updatedProductsData);
+      alert(updateResponse.data.message || 'All products stage updated to PaymentCompleted successfully.');
     } catch (error) {
-      console.error("Error removing all items:", error);
+      console.error('Error updating products stage:', error);
+      alert('Failed to update products stage.');
     }
   };
-
   const createOrder = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/create-order', {
+      const response = await axios.post(`${apiBaseUrl}/create-order`, {
         amount: totalPrice, // Amount in INR
       });
       console.log(response.data,"----------response")
@@ -52,11 +43,10 @@ const RazorpayCheckout = ({ data, totalPrice }) => {
 
   const verifyPayment = async (paymentData) => {
     try {
-      await axios.post('http://localhost:5000/verify-signature', paymentData);
+      await axios.post(`${apiBaseUrl}/verify-signature`, paymentData);
       alert('Payment verified successfully!');
-      await removeAllCartItems();
-      navigate('/home');
-      
+      await updateAllProductsStageToPaymentCompleted();
+      await paymentstatus()
     } catch (error) {
       console.error("Error verifying payment:", error);
       alert('Payment verification failed!');
@@ -107,7 +97,7 @@ const RazorpayCheckout = ({ data, totalPrice }) => {
 
   return (
     
-      <button className={classes.button} onClick={handlePayment} disabled={loading}>
+      <button  className="w-full mt-2 text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800" onClick={handlePayment} disabled={loading}>
         {loading ? 'Processing...' : 'Pay Now'}
       </button>
   

@@ -32,15 +32,12 @@ function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+
   const checkAuthToken = async () => {
     try {
-      const response = await axios.get(`${apiBaseUrl}/api/auth/check-auth`, {
-        withCredentials: true,
-      });
-      console.log(response,"-----------response")
+      const response = await axios.get(`${apiBaseUrl}/api/auth/check-auth`, { withCredentials: true });
       setIsAuthenticated(response.data.authenticated);
     } catch (error) {
-      console.error('Error checking auth token:', error);
       setIsAuthenticated(false);
     }
   };
@@ -58,10 +55,9 @@ function Navbar() {
     setModalOpen(false);
     checkAuthToken();
   };
-
   const handleSignOut = async () => {
     try {
-      await axios.post('http://localhost:5000/api/auth/sign-out', {}, { withCredentials: true });
+      await axios.post(`${apiBaseUrl}/api/auth/sign-out`, {}, { withCredentials: true });
       setIsAuthenticated(false);
     } catch (error) {
       console.error('Error signing out:', error);
@@ -101,133 +97,103 @@ function Navbar() {
   };
 
   return (
-    <>
-      <AppBar position="sticky" color="primary">
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* Mobile Menu Icon */}
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ display: { xs: 'block', sm: 'none' } }}
-            onClick={() => toggleDrawer(true)}
-          >
-            <MenuIcon />
+    <header className="fixed top-4 left-0 right-0 border-2 border-purple-300 rounded-full bg-white shadow-md flex items-center justify-between px-8 py-2 z-50">
+      <h1 class="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800">
+        <Link to="/">
+        Altaneofin Shop
+        </Link>
+      </h1>
+
+      {/* Navigation */}
+      <nav className="nav font-semibold text-lg">
+        <ul className="flex items-center">
+          <li className="p-4 border-b-2 border-purple-500 border-opacity-0 hover:border-opacity-100 hover:text-purple-500 duration-200 cursor-pointer">
+            <Link to="/home">Home</Link>
+          </li>
+          <li className="p-4 border-b-2 border-purple-500 border-opacity-0 hover:border-opacity-100 hover:text-purple-500 duration-200 cursor-pointer">
+            <Link to="/electronics">Electronics</Link>
+          </li>
+          <li className="p-4 border-b-2 border-purple-500 border-opacity-0 hover:border-opacity-100 hover:text-purple-500 duration-200 cursor-pointer">
+            <Link to="/fashion">Fashion</Link>
+          </li>
+          <li className="p-4 border-b-2 border-purple-500 border-opacity-0 hover:border-opacity-100 hover:text-purple-500 duration-200 cursor-pointer">
+            <Link to="/beauty">Beauty</Link>
+          </li>
+          <li className="p-4 border-b-2 border-purple-500 border-opacity-0 hover:border-opacity-100 hover:text-purple-500 duration-200 cursor-pointer">
+            <Link to="/home-goods">Home Goods</Link>
+          </li>
+          {isAuthenticated && (<li className="p-4 border-b-2 border-purple-500 border-opacity-0 hover:border-opacity-100 hover:text-purple-500 duration-200 cursor-pointer">
+            <Link to="/profile">Profile</Link>
+          </li>)}
+        </ul>
+      </nav>
+
+      {/* Search and Profile */}
+      <div className="w-3/12 flex justify-end items-center">
+        <form onSubmit={handleSearchSubmit} className="flex items-center">
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            sx={{
+              backgroundColor: 'white',
+              borderRadius: 1,
+              mr: 1,
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'purple', // Default border color
+                },
+                '&:hover fieldset': {
+                  borderColor: 'darkviolet', // Border color on hover
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'purple', // Border color when focused
+                },
+              },
+            }}
+          />
+          <IconButton type="submit" sx={{ color: 'inherit' }}>
+            <SearchIcon />
           </IconButton>
-          <Typography
-            variant="h6"
-            component={Link}
-            to="/"
-            sx={{ color: 'inherit', textDecoration: 'none', flexGrow: 1 }}
-          >
-            Altaneofin Shop
-          </Typography>
-          {/* Search Bar */}
-          <form
-      onSubmit={handleSearchSubmit}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        flexGrow: 2,
-        justifyContent: 'center',
-      }}
-    >
-      <TextField
-        variant="outlined"
-        size="small"
-        placeholder="Search..."
-        value={searchQuery}
-        onChange={handleSearchChange}
-        sx={{
-          bgcolor: 'white',
-          borderRadius: 1,
-          minWidth: { xs: '200px', sm: '300px' },
-        }}
-      />
-      {/* Replace the Button with IconButton */}
-      <IconButton type="submit" sx={{ color: 'white' }} aria-label="search">
-        <SearchIcon />
-      </IconButton>
-    </form>
-          {/* Links and Icons */}
-          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 2 }}>
-            <Button component={Link} to="/home" color="inherit">
-              Home
-            </Button>
-            <Button component={Link} to="/electronics" color="inherit">
-              Electronics
-            </Button>
-            <Button component={Link} to="/fashion" color="inherit">
-              Fashion
-            </Button>
-            <Button component={Link} to="/beauty" color="inherit">
-              Beauty
-            </Button>
-            <Button component={Link} to="/home-goods" color="inherit">
-              Home Goods
-            </Button>
-            <IconButton color="inherit" component={Link} to="/cart">
+          
+        </form>
+        <IconButton color="inherit" component={Link} to="/cart">
               <ShoppingCartIcon />
             </IconButton>
-            {isAuthenticated ? (
-              <>
-                 <Button component={Link} to="/profile" color="inherit">
-              Profile
-            </Button>
-                <IconButton color="inherit" onClick={handleProfileMenuOpen}>
-                  <AccountCircleIcon />
-                </IconButton>
-                <Menu
-                  anchorEl={profileMenuAnchor}
-                  open={Boolean(profileMenuAnchor)}
-                  onClose={handleProfileMenuClose}
-                >
-                  <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <Button onClick={() => handleOpenModal('Login')} color="inherit">
-                Login
-              </Button>
-            )}
-          </Box>
-        </Toolbar>
-      </AppBar>
-      {/* Mobile Drawer */}
-      <Drawer anchor="left" open={drawerOpen} onClose={() => toggleDrawer(false)}>
-        <Box sx={{ width: 250 }}>
-          <List>
-            <ListItem button component={Link} to="/home" onClick={() => toggleDrawer(false)}>
-              <ListItemText primary="Home" />
-            </ListItem>
-            <ListItem
-              button
-              component={Link}
-              to="/electronics"
-              onClick={() => toggleDrawer(false)}
-            >
-              <ListItemText primary="Electronics" />
-            </ListItem>
-            <ListItem button component={Link} to="/fashion" onClick={() => toggleDrawer(false)}>
-              <ListItemText primary="Fashion" />
-            </ListItem>
-            <ListItem button component={Link} to="/beauty" onClick={() => toggleDrawer(false)}>
-              <ListItemText primary="Beauty" />
-            </ListItem>
-            <ListItem
-              button
-              component={Link}
-              to="/home-goods"
-              onClick={() => toggleDrawer(false)}
-            >
-              <ListItemText primary="Home Goods" />
-            </ListItem>
-          </List>
-        </Box>
-      </Drawer>
-      {/* Modals */}
+        {isAuthenticated ? (
+          <>
+            <IconButton onClick={handleProfileMenuOpen}>
+            <div
+  class="flex items-center justify-center h-12 w-12 bg-purple-100 rounded-full cursor-pointer hover:bg-purple-200 transition"
+>
+  <svg
+    class="h-5 w-5 text-purple-500"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+</div>
+            </IconButton>
+            <Menu anchorEl={profileMenuAnchor} open={Boolean(profileMenuAnchor)} onClose={handleProfileMenuClose}>
+              <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+            </Menu>
+          </>
+        ) : (
+          <button  onClick={() => handleOpenModal('Login')} class="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800" >
+            Login
+          </button>
+        )}
+      </div>
       <AuthModal open={modalOpen} onClose={handleCloseModal} authType={authType} />
-    </>
+    </header>
   );
 }
 

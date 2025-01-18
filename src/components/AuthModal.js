@@ -1,98 +1,9 @@
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  Button,
-  TextField,
-  Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  FormControl,
-  FormLabel,
-  IconButton,
-} from '@mui/material';
-import { AiOutlineClose } from 'react-icons/ai';
 import axios from 'axios';
+import { AiOutlineClose } from 'react-icons/ai';
 import AuthButtons from './AuthButtons';
-import { makeStyles } from '@mui/styles';
-
-const useStyles = makeStyles({
-  closeButton: {
-  borderRadius:'unset!important',
-    justifyContent:'flex-end!important',
-  },
-  dialog: {
-    position: 'relative',
-  },
-  dialogTitle: {
-    textAlign: 'center',
-    fontWeight: 700,
-    fontSize: '2rem',
-    color: '#333',
-    marginBottom: '1rem',
-  },
-  dialogContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '1rem',
-  },
-  inputField: {
-    width: '100%',
-    marginBottom: '1rem',
-  },
-  continueButton: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#1976d2",
-    color: "white",
-    border: "none",
-    marginTop: "10px",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "14px",
-    textAlign: "center",
-    "&:hover": {
-      backgroundColor: "#394bc",
-    },
-    "&:disabled": {
-      backgroundColor: "#ddd",
-      cursor: "not-allowed",
-    },
-  },
-  otpError: {
-    marginTop: '0.5rem',
-    color: 'red',
-    fontSize: '0.875rem',
-  },
-  formControl: {
-    width: '100%',
-    marginBottom: '1rem',
-  },
-  sendOtpButton: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#1976d2",
-    color: "white",
-    border: "none",
-    marginTop: "10px",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "14px",
-    textAlign: "center",
-    "&:hover": {
-      backgroundColor: "#394bc",
-    },
-    "&:disabled": {
-      backgroundColor: "#ddd",
-      cursor: "not-allowed",
-    },
-  },
-});
 
 function AuthModal({ open, onClose, authType }) {
-  const classes = useStyles();
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -109,54 +20,43 @@ function AuthModal({ open, onClose, authType }) {
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
   const isPhone = (value) => /^[0-9]{10}$/.test(value);
 
- 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Helper function to validate email
     const validateEmail = (email) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     };
-  
-    // Helper function to validate phone (example: basic 10-digit number)
     const validatePhone = (phone) => {
       const phoneRegex = /^\d{10}$/;
       return phoneRegex.test(phone);
     };
-  
-    // Validate emailOrPhone input
     if (!emailOrPhone) {
       alert('Email or phone number is required.');
       return;
     }
-  
     if (!validateEmail(emailOrPhone) && !validatePhone(emailOrPhone)) {
       alert('Please enter a valid email or phone number.');
       return;
     }
-  
-    // OTP validation if OTP is already sent
     if (isOtpSent && (!otp || otp.length !== 6)) {
       setOtpError('Please enter a valid 6-digit OTP.');
       return;
     }
-  
-    // Proceed with API requests
     if (!isOtpSent) {
       try {
         const userCheckResponse = await axios.post(
           `${apiBaseUrl}/api/auth/check-user`,
           { emailOrPhone }
         );
-  
+
         if (userCheckResponse.data.exists) {
           setUserExists(true);
           const otpResponse = await axios.post(`${apiBaseUrl}/api/auth/send-otp`, {
             emailOrPhone,
             isPhone: validatePhone(emailOrPhone),
           });
-  
+
           if (otpResponse.status === 200) {
             setIsOtpSent(true);
           } else {
@@ -176,7 +76,7 @@ function AuthModal({ open, onClose, authType }) {
           emailOrPhone,
           otp,
         });
-  
+
         if (response.data.success) {
           console.log(`${authType} successful!`);
           onClose();
@@ -189,8 +89,6 @@ function AuthModal({ open, onClose, authType }) {
       }
     }
   };
-  
-
   const handleUserInfoChange = (e) => {
     const { name, value } = e.target;
     setUserInfo((prevInfo) => ({
@@ -198,7 +96,6 @@ function AuthModal({ open, onClose, authType }) {
       [name]: value,
     }));
   };
-
   const handleSaveUserAndSendOtp = async () => {
     try {
       const userInfoData = {
@@ -233,100 +130,146 @@ function AuthModal({ open, onClose, authType }) {
     }
   };
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onClose={onClose} className={classes.dialog}>
-      <IconButton className={classes.closeButton} onClick={onClose}>
-        <AiOutlineClose size={24} />
-      </IconButton>
-      <Typography className={classes.dialogTitle}>Welcome to Altaneofin</Typography>
-      <DialogContent className={classes.dialogContent}>
-        <AuthButtons onClose={onClose} />
-        <TextField
-          label="Enter Email"
-          variant="outlined"
-          fullWidth
-          className={classes.inputField}
-          value={emailOrPhone}
-          inputProps={{ maxLength: 10 }}
-          onChange={(e) => setEmailOrPhone(e.target.value)}
-        />
-
-        {userExists === false && isUserInfoVisible && (
-          <>
-            <TextField
-              label="Name"
-              variant="outlined"
-              fullWidth
-              className={classes.inputField}
-              value={userInfo.name}
-              onChange={handleUserInfoChange}
-              name="name"
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white rounded-lg shadow-lg max-w-3xl w-full">
+        <div className="flex justify-between items-center border-b p-4">
+          <h2 className="text-xl font-bold">Welcome to Altaneofin</h2>
+          <button onClick={onClose} className="text-gray-600 hover:text-gray-900">
+            <AiOutlineClose size={24} />
+          </button>
+        </div>
+        <div className="p-6">
+          <div className="flex items-center">
+            <img
+              src="/images/login.jpg"
+              alt="Logo"
+              className="w-96 mb-4"
             />
-            <FormControl component="fieldset" className={classes.formControl}>
-              <FormLabel component="legend">Gender</FormLabel>
-              <RadioGroup
-                name="gender"
-                value={userInfo.gender}
-                onChange={handleUserInfoChange}
-                row
+            {/* <h1 className="text-2xl font-bold">Sign Up</h1> */}
+            <div className="mt-6 w-full">
+              <AuthButtons onClose={onClose} />
+              <div className="my-6 flex items-center">
+                <div className="flex-grow border-t border-gray-300"></div>
+                <span className="px-4 text-sm text-gray-600">Or sign up with email</span>
+                <div className="flex-grow border-t border-gray-300"></div>
+              </div>
+
+              <input
+                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
+                type="email"
+                placeholder="Enter your email"
+                value={emailOrPhone}
+                onChange={(e) => setEmailOrPhone(e.target.value)}
+              />
+              {userExists === false && isUserInfoVisible && (
+                <>
+                  <div className="mb-4 mt-4">
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Full Name"
+                      value={userInfo.name}
+                      onChange={handleUserInfoChange}
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  <fieldset className="mb-4">
+                    <legend className="block text-sm font-medium text-gray-700">Gender</legend>
+                    <div className="flex space-x-4 mt-2">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="Male"
+                          checked={userInfo.gender === "Male"}
+                          onChange={handleUserInfoChange}
+                          className="text-purple-600 border-gray-300 focus:ring-purple-500"
+                        />
+                        <span className="ml-2">Male</span>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="Female"
+                          checked={userInfo.gender === "Female"}
+                          onChange={handleUserInfoChange}
+                          className="text-purple-600 border-gray-300 focus:ring-purple-500"
+                        />
+                        <span className="ml-2">Female</span>
+                      </label>
+                    </div>
+                  </fieldset>
+
+                  <div className="mb-4">
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="Phone"
+                      value={userInfo.phone}
+                      onChange={handleUserInfoChange}
+                      maxLength="10"
+                      pattern="[0-9]*"
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
+                    />
+                    <p className="mt-2 text-sm text-gray-500">Enter a valid 10-digit phone number.</p>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">Invite Code</label>
+                    <input
+                      type="text"
+                      name="inviteCode"
+                      placeholder="Invite Code"
+                      value={userInfo.inviteCode}
+                      onChange={handleUserInfoChange}
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleSaveUserAndSendOtp}
+                    className="w-full mt-2 text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800">
+                    Send OTP
+                  </button>
+                </>
+              )}
+
+              {isOtpSent && (
+                <input
+                  className="w-full px-4 py-2 mt-4 border rounded-lg focus:outline-none focus:border-purple-500"
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+              )}
+              {otpError && <p className="text-red-500 text-sm mt-2">{otpError}</p>}
+
+              <button onClick={handleSubmit} fullWidth className="w-full mt-2 text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800"
               >
-                <FormControlLabel value="Male" control={<Radio />} label="Male" />
-                <FormControlLabel value="Female" control={<Radio />} label="Female" />
-              </RadioGroup>
-            </FormControl>
-            <TextField
-  label="Phone Number"
-  variant="outlined"
-  fullWidth
-  className={classes.inputField}
-  value={userInfo.phone} // Use the appropriate state property for phone
-  onChange={handleUserInfoChange}
-  name="phone" // Update name to match phone
-  type="tel" // Set input type to "tel" for numeric keypad on mobile
-  inputProps={{
-    maxLength: 10, // Optional: Restrict to 10 digits
-    pattern: "[0-9]*", // Restrict input to numbers only
-  }}
-  helperText="Enter a valid 10-digit phone number."
-/>
-            <TextField
-              label="Invite Code"
-              variant="outlined"
-              fullWidth
-              className={classes.inputField}
-              value={userInfo.inviteCode}
-              onChange={handleUserInfoChange}
-              name="inviteCode"
-            />
-            <button
-              onClick={handleSaveUserAndSendOtp}
-              fullWidth
-              className={classes.sendOtpButton}
-            >
-              Send OTP
-            </button>
-          </>
-        )}
+                Continue
+              </button>
 
-        {isOtpSent && (
-          <>
-            <TextField
-              label="OTP"
-              variant="outlined"
-              fullWidth
-              className={classes.inputField}
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-            />
-            {otpError && <Typography className={classes.otpError}>{otpError}</Typography>}
-          </>
-        )}
-        
-        <button onClick={handleSubmit} fullWidth className={classes.continueButton}>
-          Continue
-        </button>
-      </DialogContent>
-    </Dialog>
+              <p className="mt-6 text-sm text-gray-600 text-center">
+                By signing up, you agree to our
+                <a href="#" className="text-purple-500 underline ml-1">
+                  Terms of Service
+                </a>
+                and
+                <a href="#" className="text-purple-500 underline ml-1">
+                  Privacy Policy
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

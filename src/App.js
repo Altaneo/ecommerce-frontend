@@ -16,8 +16,10 @@ import MyOrders from './pages/Profile/MyOrders';
 
 function App() {
   return (
+    
     <Router>
       <Navbar />
+      
       <Routes>
         {/* Main Pages */}
         <Route path="/" element={<Navigate to="/home" />} />

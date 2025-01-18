@@ -1,86 +1,7 @@
-import React, { useState, useEffect } from "react";
-import {
-  Card,
-  Typography,
-  Button,
-  TextField,
-  Grid,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-} from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
-const useStyles = makeStyles({
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "20px",
-    backgroundColor: "#f1f3f6",
-    minHeight: "100vh",
-  },
-  card: {
-    maxWidth: "800px",
-    margin: "20px auto",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-    borderRadius: "8px",
-    padding: '20px',
-  },
-  header: {
-    backgroundColor: "#2874f0", // Flipkart's signature blue color
-    color: "#fff", // White text for contrast
-    padding: "15px 20px", // Padding for better spacing
-    fontWeight: 600, // Bold text
-    fontSize: "20px", // Slightly larger font size
-    borderRadius: "4px 4px 0 0", // Rounded top corners
-    textAlign: "center", // Center the text
-    width: "95%", // Full width of the card
-    marginBottom: '20px!important',
-  },
-
-  field: {
-    marginBottom: "15px",
-    marginTop: '10px'
-  },
-  buttonGroup: {
-    display: "flex",
-    justifyContent: "flex-start",
-    gap: "10px",
-    marginTop: "20px",
-  },
-  gridItem: {
-    paddingLeft: "50px",
-    width: '100%',
-  },
-  saveButton: {
-    backgroundColor: "#2874f0",
-    color: "#fff",
-    "&:hover": {
-      backgroundColor: "#0d47a1",
-    },
-  },
-  cancelButton: {
-    backgroundColor: "#f44336",
-    color: "#fff",
-    "&:hover": {
-      backgroundColor: "#b71c1c",
-    },
-  },
-  staticText: {
-    color: "#757575",
-    fontSize: "1rem",
-  },
-  textId: {
-    fontSize: "1rem",
-  }
-});
-
 const UserDetails = () => {
-  const classes = useStyles();
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
   const [userData, setUserData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
@@ -97,6 +18,7 @@ const UserDetails = () => {
     alternatePhone: '',
     addressType: 'Home',
   });
+  const fetchUserDataRef = useRef(false);
 
   const handleAddressChange = (e) => {
     const { name, value } = e.target;
@@ -106,18 +28,16 @@ const UserDetails = () => {
 
   // Fetch user data
   const fetchUserData = async () => {
-    // ... existing code ...
+    if (fetchUserDataRef.current) return; // Prevent fetching if already fetching
+    fetchUserDataRef.current = true;
     try {
       const response = await axios.get(`${apiBaseUrl}/api/auth/profile`, {
         withCredentials: true,
       });
       setUserData(response.data.user);
-
-      // Initialize addressData properly
       if (response.data.user.addresses && response.data.user.addresses.length > 0) {
         setAddressData(response.data.user.addresses[0]);
       } else {
-        // Set to default if no address is found
         setAddressData({
           pincode: '',
           locality: '',
@@ -130,13 +50,12 @@ const UserDetails = () => {
         });
       }
     } catch (error) {
-      // ... existing code ...
+      setError("Failed to fetch user data.");
     } finally {
-      // ... existing code ...
+      fetchUserDataRef.current = false;
     }
   };
-  console.log(userData, addressData)
-  // Update user data
+
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
@@ -158,262 +77,292 @@ const UserDetails = () => {
       setUserData(response.data.user);
       setIsEditing(false);
     } catch (error) {
-      console.error("Error updating user profile:", error);
       setError("Failed to update profile. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
+
   useEffect(() => {
     fetchUserData();
   }, []);
 
   return (
-      <Card className={classes.card}>
-        <Typography variant="h5" className={classes.header}>
-          Personal Information
-        </Typography>
+    <>
+      <h2 className="text-4xl mt-4 mb-2 flex justify-center font-bold text-black animate-slide-in whitespace-nowrap">
 
-        {error && <Typography color="error">{error}</Typography>}
-        {success && <Typography color="primary">{success}</Typography>}
+        User Details
+      </h2>
+      <div className="flex mt-4 items-center justify-center  bg-purple-50 p-5">
 
-        {!loading ? (
-          <>
-            <Grid container spacing={2}>
-              {/* Editable or Static Fields */}
-              {isEditing ? (
-                <>
-                  <Grid item xs={24}>
-                    <TextField
-                      label="First Name"
-                      name="name"
-                      value={userData.name || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      fullWidth
-                      className={classes.field}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <FormControl component="fieldset" className={classes.field}>
-                      <FormLabel component="legend">Gender</FormLabel>
-                      <RadioGroup
-                        row
-                        name="gender"
-                        value={userData.gender || ""}
+        <div className="max-w-3xl w-full bg-white shadow-lg rounded-lg p-6">
+
+
+          {error && <p className="text-red-500">{error}</p>}
+          {success && <p className="text-purple-500">{success}</p>}
+
+          {!loading ? (
+            <>
+              <div className="space-y-5">
+                {isEditing ? (
+                  <>
+                    <div>
+                      <input
+                        type="text"
+                        name="name"
+                        value={userData.name || ""}
                         onChange={handleChange}
-                      >
-                        <FormControlLabel
-                          value="Male"
-                          control={<Radio />}
-                          label="Male"
-                        />
-                        <FormControlLabel
-                          value="Female"
-                          control={<Radio />}
-                          label="Female"
-                        />
-                      </RadioGroup>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Email"
-                      name="email"
-                      value={userData.email || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      fullWidth
-                      className={classes.field}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Phone"
-                      name="phone"
-                      value={userData.phone || ""}
-                      onChange={handleChange}
-                      variant="outlined"
-                      fullWidth
-                      inputProps={{ maxLength: 10 }}
-                      className={classes.field}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Pincode"
-                      name="pincode"
-                      value={addressData.pincode}
-                      onChange={handleAddressChange}
-                      variant="outlined"
-                      fullWidth
-                      className={classes.field}
-                      required
-                      type="number"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Locality"
-                      name="locality"
-                      value={addressData.locality}
-                      onChange={handleAddressChange}
-                      variant="outlined"
-                      fullWidth
-                      className={classes.field}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Address (Area and Street)"
-                      name="streetAddress"
-                      value={addressData.streetAddress}
-                      onChange={handleAddressChange}
-                      variant="outlined"
-                      fullWidth
-                      className={classes.field}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="City/District/Town"
-                      name="city"
-                      value={addressData.city}
-                      onChange={handleAddressChange}
-                      variant="outlined"
-                      fullWidth
-                      className={classes.field}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="State"
-                      name="state"
-                      value={addressData.state}
-                      onChange={handleAddressChange}
-                      variant="outlined"
-                      fullWidth
-                      className={classes.field}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Landmark (Optional)"
-                      name="landmark"
-                      value={addressData.landmark}
-                      onChange={handleAddressChange}
-                      variant="outlined"
-                      fullWidth
-                      className={classes.field}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Alternate Phone (Optional)"
-                      name="alternatePhone"
-                      value={addressData.alternatePhone}
-                      onChange={handleAddressChange}
-                      variant="outlined"
-                      inputProps={{ maxLength: 10 }}
-                      fullWidth
-                      className={classes.field}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <FormLabel component="legend">Address Type</FormLabel>
-                    <RadioGroup
-                      row
-                      name="addressType"
-                      value={addressData.addressType}
-                      onChange={handleAddressChange}
-                    >
-                      <FormControlLabel value="Home" control={<Radio />} label="Home" />
-                      <FormControlLabel value="Work" control={<Radio />} label="Work" />
-                    </RadioGroup>
-                  </Grid>
-                </>
-              ) : (
-                <>
-                  <Grid item xs={12} variant="body1" className={classes.gridItem}>
-                    <Typography >
-                      <strong className={classes.textId}>First Name: </strong>
-                      <span className={classes.staticText}>{userData.name || "N/A"}</span>
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} className={classes.gridItem}>
-                    <Typography variant="body1">
-                      <strong className={classes.textId}>Gender: </strong>
-                      <span className={classes.staticText}>{userData.gender || "N/A"}</span>
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} className={classes.gridItem}>
-                    <Typography variant="body1">
-                      <strong className={classes.textId}>Email: </strong>
-                      <span className={classes.staticText}>{userData.email || "N/A"}</span>
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} className={classes.gridItem}>
-                    <Typography variant="body1">
-                      <strong className={classes.textId}>Phone: </strong>
-                      <span className={classes.staticText}>{userData.phone || "N/A"}</span>
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} className={classes.gridItem}>
-                    <Typography variant="body1">
-                      <strong className={classes.textId}>Address: </strong>
-                      <span className={classes.staticText}>
-                        {`${addressData?.streetAddress || ''}, ${addressData?.locality || ''}\n${addressData?.city || ''}, ${addressData?.state || ''} ${addressData?.pincode || ''}\n${addressData?.country || 'India'}`}
-                      </span>
-                    </Typography>
-                  </Grid>
-                </>
-              )}
-            </Grid>
+                        placeholder="First Name"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-2">Gender</label>
+                      <div className="flex space-x-4">
+                        <label>
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="Male"
+                            checked={userData.gender === "Male"}
+                            onChange={handleChange}
+                          />
+                          Male
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="Female"
+                            checked={userData.gender === "Female"}
+                            onChange={handleChange}
+                          />
+                          Female
+                        </label>
+                      </div>
+                    </div>
+                    <div>
+                      <input
+                        type="email"
+                        name="email"
+                        value={userData.email || ""}
+                        onChange={handleChange}
+                        placeholder="Email"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="phone"
+                        value={userData.phone || ""}
+                        onChange={handleChange}
+                        placeholder="Phone"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                        maxLength="10"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        name="pincode"
+                        value={addressData.pincode}
+                        onChange={handleAddressChange}
+                        placeholder="Pincode"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="locality"
+                        value={addressData.locality}
+                        onChange={handleAddressChange}
+                        placeholder="Locality"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="streetAddress"
+                        value={addressData.streetAddress}
+                        onChange={handleAddressChange}
+                        placeholder="Address (Area and Street)"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="city"
+                        value={addressData.city}
+                        onChange={handleAddressChange}
+                        placeholder="City/District/Town"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="state"
+                        value={addressData.state}
+                        onChange={handleAddressChange}
+                        placeholder="State"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="landmark"
+                        value={addressData.landmark}
+                        onChange={handleAddressChange}
+                        placeholder="Landmark (Optional)"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="alternatePhone"
+                        value={addressData.alternatePhone}
+                        onChange={handleAddressChange}
+                        placeholder="Alternate Phone (Optional)"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                        maxLength="10"
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-2">Address Type</label>
+                      <div className="flex space-x-4">
+                        <label>
+                          <input
+                            type="radio"
+                            name="addressType"
+                            value="Home"
+                            checked={addressData.addressType === "Home"}
+                            onChange={handleAddressChange}
+                          />
+                          Home
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="addressType"
+                            value="Work"
+                            checked={addressData.addressType === "Work"}
+                            onChange={handleAddressChange}
+                          />
+                          Work
+                        </label>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div class="bg-white overflow-hidden shadow rounded-lg border">
+                      <div class="px-4 py-5 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                          User Profile
+                        </h3>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                          This is some information about the user.
+                        </p>
+                      </div>
+                      <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+                        <dl class="sm:divide-y sm:divide-gray-200">
+                          <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">
+                              Full name
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              {userData.name || "N/A"}
+                            </dd>
+                          </div>
+                          <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">
+                              Email address
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              {userData.email || "N/A"}
+                            </dd>
+                          </div>
+                          <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">
+                              Phone number
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              {userData.phone || "N/A"}
+                            </dd>
+                          </div>
+                          <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">
+                              Gender:
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              {userData.gender || "N/A"}
+                            </dd>
+                          </div>
+                          {addressData?.city && (
+                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                              <dt class="text-sm font-medium text-gray-500">
+                                Address
+                              </dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
 
-            <div className={classes.buttonGroup}>
-              {isEditing ? (
-                <>
-                  <Button
-                    variant="contained"
-                    className={classes.saveButton}
-                    onClick={handleSubmit}
-                    disabled={loading}
+                                {userData.name}, {addressData.pincode} ,{addressData.streetAddress}, {addressData.locality}, {addressData.city}, {addressData.state}
+                              </dd>
+                            </div>
+                          )}
+                        </dl>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="flex justify-end mt-5">
+                {isEditing ? (
+                  <>
+                    <button
+                      className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+                      onClick={handleSubmit}
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      className="bg-gray-300 text-black px-4 py-2 rounded ml-2 hover:bg-gray-400"
+                      onClick={() => setIsEditing(false)}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+                    onClick={() => setIsEditing(true)}
                   >
-                    Save
-                  </Button>
-                  <Button
-                    variant="contained"
-                    className={classes.cancelButton}
-                    onClick={() => setIsEditing(false)}
-                    disabled={loading}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  variant="contained"
-                  className={classes.saveButton}
-                  onClick={() => setIsEditing(true)}
-                >
-                  Edit Details
-                </Button>
-              )}
-            </div>
-          </>
-        ) : (
-          <Typography>Loading...</Typography>
-        )}
-      </Card>
- 
+                    Edit Profile
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <p>Loading...</p>
+          )}
+        </div>
+      </div>
+    </>
   );
 };
 
