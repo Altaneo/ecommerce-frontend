@@ -7,6 +7,7 @@ function CartPage() {
   const [cartItems, setCartItems] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [authType, setAuthType] = useState('Login');
+  const [isOrderConfirmed, setIsOrderConfirmed] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [paymentSuccessful, setPaymentSuccessful] = useState(false);
   const [priceDetails, setPriceDetails] = useState({
@@ -38,9 +39,8 @@ function CartPage() {
         console.error('Error fetching cart items:', error);
       }
     };
-
     fetchCartItems();
-  }, []);
+  }, [isOrderConfirmed]);
 
   const checkAuthToken = async () => {
     try {
@@ -107,7 +107,11 @@ function CartPage() {
   };
 
   const calculatePriceDetails = (items) => {
-    const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const totalPrice = items.reduce((sum, item) => {
+      return item.stage !== 'OrderConfirmed' 
+        ? sum + item.price * item.quantity 
+        : sum;
+    }, 0);
     const discount = totalPrice * 0.1;
     const finalAmount = totalPrice - discount;
     setPriceDetails({
@@ -131,67 +135,72 @@ function CartPage() {
       alert('Failed to update products stage.');
     }
   };
+  useEffect(() => {
+    const checkOrderConfirmation = (items) => {
+      return items.every(item => item.stage === 'OrderConfirmed');
+    };
 
+    setIsOrderConfirmed(checkOrderConfirmation(cartItems));
+  }, [cartItems]);
   return (
     <div className="flex flex-wrap mt-24 p-5 gap-5 justify-between">
       <div className="flex-1 p-5 border rounded-lg bg-purple-100">
         <h2 className="text-lg font-semibold mb-4">Cart Items</h2>
-        {cartItems.length > 0 ? (
-          cartItems.map((item) => (
-            <div
-              key={item.productId}
-              className="group relative flex items-center gap-12 p-4 border rounded-lg bg-white mb-4 overflow-hidden"
-            >
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-40 h-40 object-cover rounded-lg"
-              />
-              <div className="flex-grow mr-8">
-                <h3 className="text-base font-medium">{item.name}</h3>
-                <p className="text-sm">Price: ₹{item.price}</p>
-                <div className="flex items-center gap-2 mt-2">
+        {(cartItems.length > 0 && !isOrderConfirmed) ? (
+          cartItems.filter((item) => item.stage !== 'OrderConfirmed') // Exclude items with stage 'OrderConfirmed'
+            .map((item) => (
+              <div
+                key={item.productId}
+                className="group relative flex items-center gap-12 p-4 border rounded-lg bg-white mb-4 overflow-hidden"
+              >
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-40 h-40 object-cover rounded-lg"
+                />
+                <div className="flex-grow mr-8">
+                  <h3 className="text-base font-medium">{item.name}</h3>
+                  <p className="text-sm">Price: ₹{item.price}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      onClick={() => handleQuantityChange(item.productId, -1)}
+                      className="px-3 py-1 border rounded-lg"
+                    >
+                      −
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() => handleQuantityChange(item.productId, 1)}
+                      className="px-3 py-1 border rounded-lg"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+          
+                {/* Right-side container */}
+                <div className="relative">
+                  {/* Cross Icon */}
+                  <span className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 cursor-pointer transition-transform duration-300 group-hover:translate-x-[50px]">
+                    ×
+                  </span>
+          
+                  {/* Sliding Remove Button */}
                   <button
-                    onClick={() => handleQuantityChange(item.productId, -1)}
-                    className="px-3 py-1 border rounded-lg"
+                    onClick={() => handleRemoveItem(item.productId)}
+                    className="absolute top-1/2 right-[-60px] transform -translate-y-1/2 px-4 py-2 bg-red-500 text-white rounded-lg opacity-0 transition-all duration-300 group-hover:right-4 group-hover:opacity-100 group-hover:outline group-hover:outline-2 group-hover:outline-purple-500"
                   >
-                    −
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange(item.productId, 1)}
-                    className="px-3 py-1 border rounded-lg"
-                  >
-                    +
+                    Remove
                   </button>
                 </div>
               </div>
-
-              {/* Right-side container */}
-              <div className="relative">
-                {/* Cross Icon */}
-                <span className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 cursor-pointer transition-transform duration-300 group-hover:translate-x-[50px]">
-                  ×
-                </span>
-
-                {/* Sliding Remove Button */}
-                <button
-                  onClick={() => handleRemoveItem(item.productId)}
-                  className="absolute top-1/2 right-[-60px] transform -translate-y-1/2 px-4 py-2 bg-red-500 text-white rounded-lg opacity-0 transition-all duration-300 group-hover:right-4 group-hover:opacity-100 group-hover:outline group-hover:outline-2 group-hover:outline-purple-500"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-
-
-
-          ))
+            ))
+          
         ) : (
           <p>Your cart is empty.</p>
         )}
 
-        {cartItems.length > 0 && (
+        {cartItems.length > 0 && !isOrderConfirmed && (
           <div>
             {isAuthenticated ? (
               paymentSuccessful ? (
@@ -251,7 +260,7 @@ function CartPage() {
           </div>
         )}
       </div>
-
+      {(cartItems.length > 0 && !isOrderConfirmed) &&(
       <div className="w-1/3 p-6 border rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg">
         <h2 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">
           Price Details
@@ -276,9 +285,9 @@ function CartPage() {
           <span className="text-purple-600">₹{priceDetails.finalAmount}</span>
         </div>
         <div className="mt-6">
-        <h3 className="text-base font-semibold text-white mb-4 px-4 py-2 rounded bg-gradient-to-r from-purple-500 to-purple-700 shadow text-center">
-  Payment Methods
-</h3>
+          <h3 className="text-base font-semibold text-white mb-4 px-4 py-2 rounded bg-gradient-to-r from-purple-500 to-purple-700 shadow text-center">
+            Payment Methods
+          </h3>
           <div className="flex flex-wrap items-center justify-center gap-6 bg-purple-50 p-4 rounded-lg shadow-sm">
             {/* UPI Icon */}
             <div className="flex flex-col items-center">
@@ -319,6 +328,7 @@ function CartPage() {
           </div>
         </div>
       </div>
+       )}
       <AuthModal open={modalOpen} type={authType} onClose={handleCloseModal} />
     </div>
   );

@@ -3,6 +3,7 @@ import axios from 'axios';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Link } from 'react-router-dom';
 
 const carouselImages = [
   '/images/poster1.jpg',
@@ -223,6 +224,7 @@ function LandingPage() {
           >
             {featuredProducts.length > 0 ? (
               featuredProducts.map((product, index) => (
+
                 <div
                   key={product._id}
                   className={`shadow-lg rounded-xl p-4 transition-transform transform 
@@ -237,7 +239,7 @@ function LandingPage() {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
                     />
                     <div className="absolute flex flex-col top-0 right-0 p-3">
                       <button className="transition ease-in duration-300 bg-gray-800 hover:text-purple-500 shadow hover:shadow-md text-gray-500 rounded-full w-8 h-8 text-center p-1">
@@ -279,11 +281,15 @@ function LandingPage() {
                           ))}
                         </div>
                       </div>
+                      <Link
+      to={`/product/${product._id}`}
+    >
                       <div className="flex items-center w-full justify-between min-w-0">
                         <h2 className="text-lg mr-auto cursor-pointer text-black-200 hover:text-purple-500 truncate">
                           {product.name}
                         </h2>
                       </div>
+                      </Link>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-3xl font-bold text-gray-900 dark:text-white">

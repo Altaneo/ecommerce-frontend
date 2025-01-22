@@ -24,9 +24,12 @@ function HomeGoods() {
   }, []); // Empty dependency array ensures the effect runs only once
 
   if (loading) {
-    return <p>Loading products...</p>; // Show loading message while fetching
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
   }
-
   if (error) {
     return <p>{error}</p>; // Show error message if fetch fails
   }

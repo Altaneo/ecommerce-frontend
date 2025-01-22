@@ -33,7 +33,6 @@ const RazorpayCheckout = ({ data, totalPrice,paymentstatus }) => {
       const response = await axios.post(`${apiBaseUrl}/create-order`, {
         amount: totalPrice, // Amount in INR
       });
-      console.log(response.data,"----------response")
       return response.data;
     } catch (error) {
       console.error("Error creating order:", error);

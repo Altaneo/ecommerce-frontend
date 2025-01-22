@@ -13,6 +13,8 @@ import Footer from './components/Footer';
 import ProfileLayout from './pages/Profile';
 import UserDetails from './pages/Profile/UserDetails';
 import MyOrders from './pages/Profile/MyOrders';
+import Notifications from './pages/Profile/Notification';
+import ProductDetails from './pages/ProductDetails';
 
 function App() {
   return (
@@ -30,9 +32,11 @@ function App() {
         <Route path="/home-goods" element={<HomeGoods />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/search" element={<SearchResults />} />
+        <Route path="/product/:productId" element={<ProductDetails />} />
         <Route path="/profile" element={<ProfileLayout />}>
           <Route path="user-details" element={<UserDetails />} />
           <Route path="my-orders" element={<MyOrders />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route path="" element={<Navigate to="user-details" />} />
         </Route>
         <Route path="*" element={<Navigate to="/home" />} />

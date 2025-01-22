@@ -1,15 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  CircularProgress,
-  Box,
-  Typography,
-  Button,
-} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import ProductFilter from './ProductLists';
-import { formatCategories } from '../utils/comman';
 
 // Styles
 const useStyles = makeStyles({

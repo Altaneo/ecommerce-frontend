@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Range } from 'react-range';
 import axios from 'axios';
-import { formatCategories } from '../utils/comman';
+import { Link } from 'react-router-dom';
 
 function ProductFilter({ products, categories }) {
   const [isVisible, setIsVisible] = useState(false);
@@ -93,128 +92,130 @@ function ProductFilter({ products, categories }) {
 
   return (
     <div className="flex gap-5 p-5 mt-24">
-      <div className="bg-white text-black p-4 rounded-lg w-72 border border-purple-800">
-        <div
-          className="font-bold mb-2 cursor-pointer flex justify-center items-center text-4xl" // Increase font size
-        >
-          Filter
-        </div>
-        <hr className="border-purple-800 mb-2" />
-        {/* Categories Section */}
-        <div className="mb-5">
-          <div className="mb-8">
-            <img
-              src="/images/sideImage.png" // Replace with your image path
-              alt="Sidebar Banner"
-              className="w-full h-auto rounded-lg" // Adjust the class as needed
+    <div
+  className="bg-white text-black p-4 rounded-lg w-72 border border-purple-800 max-h-[100vh] min-h-[50vh] overflow-y-auto sticky top-4"
+>
+  <div className="font-bold mb-2 cursor-pointer flex justify-center items-center text-4xl">
+    Filter
+  </div>
+  <hr className="border-purple-800 mb-2" />
+
+  {/* Categories Section */}
+  <div className="mb-5">
+    <div className="mb-8">
+      <img
+        src="/images/sideImage.png"
+        alt="Sidebar Banner"
+        className="w-full h-auto rounded-lg"
+      />
+    </div>
+    <div
+      className="font-bold mb-2 cursor-pointer flex justify-between items-center"
+      onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+    >
+      CATEGORIES
+      <span className="text-purple-800">{isCategoriesOpen ? '-' : '+'}</span>
+    </div>
+    <hr className="border-purple-800 mb-2" />
+    {isCategoriesOpen && (
+      <div>
+        {categories.map((category) => (
+          <div
+            key={category}
+            onClick={() => {
+              const newCategories = filters.category.includes(category)
+                ? filters.category.filter((c) => c !== category)
+                : [...filters.category, category];
+              setFilters((prev) => ({ ...prev, category: newCategories }));
+            }}
+            className="flex items-center cursor-pointer mb-2"
+          >
+            <input
+              type="checkbox"
+              checked={filters.category.includes(category)}
+              readOnly
+              className="mr-2"
             />
+            <label className="text-black">{formatCategories(category)}</label>
           </div>
-          <div
-            className="font-bold mb-2 cursor-pointer flex justify-between items-center"
-            onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
-          >
-            CATEGORIES
-            <span className="text-purple-800">{isCategoriesOpen ? '-' : '+'}</span>
-          </div>
-          <hr className="border-purple-800 mb-2" />
-          {isCategoriesOpen && (
-            <div>
-              {categories.map((category) => (
-                <div
-                  key={category}
-                  onClick={() => {
-                    const newCategories = filters.category.includes(category)
-                      ? filters.category.filter((c) => c !== category)
-                      : [...filters.category, category];
-                    setFilters((prev) => ({ ...prev, category: newCategories }));
-                  }}
-                  className="flex items-center cursor-pointer mb-2"
-                >
-                  <input
-                    type="checkbox"
-                    checked={filters.category.includes(category)}
-                    readOnly
-                    className="mr-2"
-                  />
-                  <label className="text-black">{formatCategories(category)}</label>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Price Section */}
-        <div className="mb-5">
-          <div
-            className="font-bold mb-2 cursor-pointer flex justify-between items-center"
-            onClick={() => setIsPriceOpen(!isPriceOpen)}
-          >
-            PRICE
-            <span className="text-purple-800">{isPriceOpen ? '-' : '+'}</span>
-          </div>
-          <hr className="border-purple-800 mb-2" />
-          {isPriceOpen && (
-            <div className="flex justify-between">
-              <input
-                type="number"
-                value={filters.priceRange[0]}
-                onChange={(e) => {
-                  const minPrice = Math.max(0, Number(e.target.value)); // Ensure minPrice is not negative
-                  setFilters((prev) => ({ ...prev, priceRange: [minPrice, prev.priceRange[1]] }));
-                }}
-                className="border border-purple-800 rounded-lg p-2 w-28"
-                placeholder="Min"
-              />
-              <span className="mx-2">to</span>
-              <input
-                type="number"
-                value={filters.priceRange[1]}
-                onChange={(e) => {
-                  const maxPrice = Math.max(filters.priceRange[0], Number(e.target.value)); // Ensure maxPrice is not less than minPrice
-                  setFilters((prev) => ({ ...prev, priceRange: [prev.priceRange[0], maxPrice] }));
-                }}
-                className="border border-purple-800 rounded-lg p-2 w-28"
-                placeholder="Max"
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Customer Ratings Section */}
-        <div>
-          <div
-            className="font-bold mb-2 cursor-pointer flex justify-between items-center"
-            onClick={() => setIsRatingsOpen(!isRatingsOpen)}
-          >
-            Customer Ratings
-            <span className="text-purple-800">{isRatingsOpen ? '-' : '+'}</span>
-          </div>
-          <hr className="border-purple-800 mb-2" />
-          {isRatingsOpen && (
-            <div>
-              {['4', '3', '2', '1'].map((rating) => (
-                <div
-                  key={rating}
-                  onClick={() => setFilters((prev) => ({ ...prev, rating }))}
-                  className="flex items-center cursor-pointer mb-2"
-                >
-                  <input
-                    type="radio"
-                    name="rating"
-                    checked={filters.rating === rating}
-                    readOnly
-                    className="mr-2"
-                  />
-                  <label className="text-black">{rating}★ & above</label>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        ))}
       </div>
+    )}
+  </div>
+
+  {/* Price Section */}
+  <div className="mb-5">
+    <div
+      className="font-bold mb-2 cursor-pointer flex justify-between items-center"
+      onClick={() => setIsPriceOpen(!isPriceOpen)}
+    >
+      PRICE
+      <span className="text-purple-800">{isPriceOpen ? '-' : '+'}</span>
+    </div>
+    <hr className="border-purple-800 mb-2" />
+    {isPriceOpen && (
+      <div className="flex justify-between">
+        <input
+          type="number"
+          value={filters.priceRange[0]}
+          onChange={(e) => {
+            const minPrice = Math.max(0, Number(e.target.value));
+            setFilters((prev) => ({ ...prev, priceRange: [minPrice, prev.priceRange[1]] }));
+          }}
+          className="border border-purple-800 rounded-lg p-2 w-28"
+          placeholder="Min"
+        />
+        <span className="mx-2">to</span>
+        <input
+          type="number"
+          value={filters.priceRange[1]}
+          onChange={(e) => {
+            const maxPrice = Math.max(filters.priceRange[0], Number(e.target.value));
+            setFilters((prev) => ({ ...prev, priceRange: [prev.priceRange[0], maxPrice] }));
+          }}
+          className="border border-purple-800 rounded-lg p-2 w-28"
+          placeholder="Max"
+        />
+      </div>
+    )}
+  </div>
+
+  {/* Customer Ratings Section */}
+  <div>
+    <div
+      className="font-bold mb-2 cursor-pointer flex justify-between items-center"
+      onClick={() => setIsRatingsOpen(!isRatingsOpen)}
+    >
+      Customer Ratings
+      <span className="text-purple-800">{isRatingsOpen ? '-' : '+'}</span>
+    </div>
+    <hr className="border-purple-800 mb-2" />
+    {isRatingsOpen && (
+      <div>
+        {['4', '3', '2', '1'].map((rating) => (
+          <div
+            key={rating}
+            onClick={() => setFilters((prev) => ({ ...prev, rating }))}
+            className="flex items-center cursor-pointer mb-2"
+          >
+            <input
+              type="radio"
+              name="rating"
+              checked={filters.rating === rating}
+              readOnly
+              className="mr-2"
+            />
+            <label className="text-black">{rating}★ & above</label>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
 
 
-      <div className="flex-1 bg-white p-4">
+
+      <div className="flex-1 purple-white p-4">
         <div className="relative flex flex-col items-center justify-center min-h-screen">
           <div ref={sectionRef} className="flex flex-wrap justify-center">
             {filteredProducts.length > 0 ? (
@@ -230,7 +231,7 @@ function ProductFilter({ products, categories }) {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
                     />
                     <div className="absolute flex flex-col top-0 right-0 p-3">
                       <button className="transition ease-in duration-300 bg-gray-800 hover:text-purple-500 shadow hover:shadow-md text-gray-500 rounded-full w-8 h-8 text-center p-1">
@@ -259,7 +260,10 @@ function ProductFilter({ products, categories }) {
                         </div>
                       </div>
                     </div>
-                    <h2 className="text-lg text-black font-bold truncate">{product.name}</h2>
+                    <Link
+                      to={`/product/${product._id}`}>
+                      <h2 className="text-lg text-black font-bold truncate">{product.name}</h2>
+                    </Link>
                     <p className="text-gray-700">{product.description}</p>
                     <div className="flex justify-between items-center mt-3">
                       <span className="text-lg font-bold text-gray-900">₹{product.price}</span>
