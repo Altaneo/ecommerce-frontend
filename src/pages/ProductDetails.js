@@ -120,7 +120,7 @@ const ProductDetails = () => {
             <div className="flex flex-col md:flex-row gap-8">
                 <div className="w-full md:w-1/2">
                     <img
-                        src={product.image}
+                        src={`${apiBaseUrl}${product.image}`}
                         alt={product.name}
                         className="w-full rounded-lg shadow-md"
                     />

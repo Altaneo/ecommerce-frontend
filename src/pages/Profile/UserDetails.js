@@ -7,6 +7,7 @@ const UserDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [image, setImage] = useState("");
   const [success, setSuccess] = useState("");
   const [addressData, setAddressData] = useState({
     pincode: '',
@@ -55,7 +56,38 @@ const UserDetails = () => {
       fetchUserDataRef.current = false;
     }
   };
-
+  const handleProfilePicChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("profilePicture", file);
+      try {
+        const response = await axios.post(
+          `${apiBaseUrl}/upload`, 
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+  
+        if (response.data.success) {
+          setImage(response.data.imageUrl)
+          setUserData((prev) => ({
+            ...prev,
+            profilePicture: image, // Save the image URL
+          }));
+          alert("Image uploaded successfully!");
+        } else {
+          alert("Failed to upload image.");
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("Failed to upload image.");
+      }
+    }
+  };
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
@@ -66,9 +98,12 @@ const UserDetails = () => {
         {
           name: userData.name,
           uid: userData._id,
+          bio:userData.bio,
           gender: userData.gender,
+          role: userData.role,
           email: userData.email,
           phone: userData.phone,
+          profilePicture:image,
           addresses: [addressData],
         },
         { withCredentials: true }
@@ -82,8 +117,7 @@ const UserDetails = () => {
       setLoading(false);
     }
   };
-
-  const handleChange = (e) => {
+  const handleChange = (e) => { 
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
@@ -122,6 +156,16 @@ const UserDetails = () => {
                       />
                     </div>
                     <div>
+                      <input
+                        type="text"
+                        name="bio"
+                        value={userData.bio || ""}
+                        onChange={handleChange}
+                        placeholder="Bio"
+                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+                    <div>
                       <label className="block mb-2">Gender</label>
                       <div className="flex space-x-4">
                         <label>
@@ -147,6 +191,31 @@ const UserDetails = () => {
                       </div>
                     </div>
                     <div>
+                      <label className="block mb-2">Role</label>
+                      <div className="flex space-x-4">
+                        <label>
+                          <input
+                            type="radio"
+                            name="role"
+                            value="influencer"
+                            checked={userData.role === "influencer"}
+                            onChange={handleChange}
+                          />
+                          influencer
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="role"
+                            value="customer"
+                            checked={userData.role === "customer"}
+                            onChange={handleChange}
+                          />
+                          Customer
+                        </label>
+                      </div>
+                    </div>
+                    <div>
                       <input
                         type="email"
                         name="email"
@@ -167,6 +236,13 @@ const UserDetails = () => {
                         maxLength="10"
                       />
                     </div>
+                    <label className="block mb-2">Profile Picture</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePicChange}
+                      className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
+                    />
                     <div>
                       <input
                         type="number"
@@ -200,6 +276,7 @@ const UserDetails = () => {
                         required
                       />
                     </div>
+
                     <div>
                       <input
                         type="text"
@@ -312,6 +389,14 @@ const UserDetails = () => {
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                               {userData.gender || "N/A"}
+                            </dd>
+                          </div>
+                          <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">
+                              Role:
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              {userData.role || "N/A"}
                             </dd>
                           </div>
                           {addressData?.city && (

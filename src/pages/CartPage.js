@@ -154,7 +154,7 @@ function CartPage() {
                 className="group relative flex items-center gap-12 p-4 border rounded-lg bg-white mb-4 overflow-hidden"
               >
                 <img
-                  src={item.image}
+                  src={`${apiBaseUrl}${item.image}`}
                   alt={item.name}
                   className="w-40 h-40 object-cover rounded-lg"
                 />

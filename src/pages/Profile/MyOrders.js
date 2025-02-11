@@ -29,7 +29,7 @@ function MyOrders() {
           cartItems.map((item) => (
             <div key={item.productId} className="flex items-start bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow duration-300">
               <img
-                src={item.image}
+                src={`${apiBaseUrl}${item.image}`}
                 alt={item.name}
                 className="w-24 h-24 object-cover rounded-lg mr-4"
               />

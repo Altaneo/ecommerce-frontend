@@ -44,7 +44,8 @@ const AuthButtons = ({ onClose }) => {
       const response = await axios.post(`${apiBaseUrl}/api/auth/verifyAuth-token`, { idToken }, { withCredentials: true });
 
       if (response.data.success) {
-        alert('Login successful!');
+        alert('Now You are redirected to youtube login');
+        window.location.href =`${apiBaseUrl}/auth/youtube`
         onClose()
       } else {
         alert('Login failed.');
@@ -61,7 +62,8 @@ const AuthButtons = ({ onClose }) => {
       const response = await axios.post(`${apiBaseUrl}/api/auth/verifyAuth-token`, { idToken }, { withCredentials: true });
 
       if (response.data.success) {
-        alert('Login successful!');
+        alert('Now You are redirected to youtube login');
+        window.location.href =`${apiBaseUrl}/auth/youtube`
         onClose();
       } else {
         alert('Login failed.');

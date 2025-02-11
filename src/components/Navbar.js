@@ -3,14 +3,19 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Dialog,
+  DialogContent,
   TextField,
 } from '@mui/material';
-import { Link, useNavigate,useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import AuthModal from './AuthModal';
 import axios from 'axios';
+import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from '@mui/icons-material/Search';
+import ChatComponent from './Chatbot';
 function Navbar() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [authType, setAuthType] = useState('Login');
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [totalNotification, setTotalNotification] = useState(0);
@@ -62,6 +67,7 @@ function Navbar() {
     try {
       await axios.post(`${apiBaseUrl}/api/auth/sign-out`, {}, { withCredentials: true });
       setIsAuthenticated(false);
+      await checkAuthToken()
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -95,7 +101,7 @@ function Navbar() {
       <nav className="nav font-semibold text-lg">
         <ul className="flex items-center">
           <li className="p-4 border-b-2 border-purple-500 border-opacity-0 hover:border-opacity-100 hover:text-purple-500 duration-200 cursor-pointer">
-            <Link to="/home">Home</Link>
+            <Link to="/home" state={{isAuthenticated:isAuthenticated}}>Home</Link>
           </li>
           <li className="p-4 border-b-2 border-purple-500 border-opacity-0 hover:border-opacity-100 hover:text-purple-500 duration-200 cursor-pointer">
             <Link to="/electronics">Electronics</Link>
@@ -114,7 +120,7 @@ function Navbar() {
           </li>)}
         </ul>
       </nav>
-      <div className="w-3/12 flex justify-end items-center">
+      <div className=" flex justify-end items-center">
         <form onSubmit={handleSearchSubmit} className="flex items-center">
           <TextField
             variant="outlined"
@@ -161,6 +167,28 @@ function Navbar() {
               {totalQuantity}
             </div>
           </div>
+        </IconButton>
+        <IconButton color="inherit" onClick={() => setChatOpen(true)}>
+          <div className="relative bg-green-100 p-2 rounded-full">
+            {/* Chat Icon */}
+            <svg
+              className="w-8 h-8 text-green-600 animate-wiggle"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+              <path d="M8 12h.01M12 12h.01M16 12h.01" />
+            </svg>
+          </div>
+
+
         </IconButton>
         <IconButton color="inherit" component={Link} to="/profile/notifications">
           <div className="relative bg-green-100 p-2 rounded-full">
@@ -214,6 +242,20 @@ function Navbar() {
         )}
       </div>
       <AuthModal open={modalOpen} onClose={handleCloseModal} authType={authType} />
+      <Dialog open={chatOpen} onClose={() => setChatOpen(false)} fullWidth maxWidth="sm">
+  <div className="relative">
+    <IconButton
+      aria-label="close"
+      onClick={() => setChatOpen(false)}
+      className="absolute top-2 left-2 z-10"
+    >
+      <CloseIcon />
+    </IconButton>
+    <DialogContent>
+      <ChatComponent />
+    </DialogContent>
+  </div>
+</Dialog>
     </header>
   );
 }

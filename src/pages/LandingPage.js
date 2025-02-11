@@ -1,318 +1,268 @@
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
-import Slider from 'react-slick';
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import AuthModal from "../components/AuthModal";
+import LiveStreamCard from "../components/LiveStreamCard";
+import ProductCard from "../components/ProductCard";
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { Link } from 'react-router-dom';
 
-const carouselImages = [
-  '/images/poster1.jpg',
-  '/images/poster5.png',
-  '/images/poster2.png',
-];
+const apiBaseUrl =
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 1,
-  slidesToScroll: 1,
-  autoplay: true,
-  autoplaySpeed: 3000,
-};
-
-function LandingPage() {
+const LandingPage = () => {
+  const { role, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const scrollRef = useRef(null);
+  const productScrollRef = useRef(null);
   const [liveStreams, setLiveStreams] = useState([]);
+  const [influencers, setInfluencers] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
-  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
   const [currentWord, setCurrentWord] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
-  const words = ["Welcome to Altaneofin Shop!", "Discover amazing products!", "Experience seamless shopping!"];
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef(null);
-
+  const [isLoading, setIsLoading] = useState(true);
+  const words = ["Welcome to your", "social-selling", "Network!"];
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
-      try {
-        const response = await axios.get(`${apiBaseUrl}/api/featureProducts`);
-        setFeaturedProducts(response.data);
-      } catch (err) {
-        console.error('Error fetching products:', err);
-      }
-    };
-
-    const authenticateWithYouTube = async () => {
-      try {
-        const response = await axios.get(`${apiBaseUrl}/auth/youtube`, {
-          withCredentials: true, // Important if you're using sessions
-        });
-        // Redirect the user to the auth URL
-        window.location.href = response.data.authUrl; // Assuming your backend sends the auth URL
-      } catch (error) {
-        console.error('Error initiating authentication:', error);
-      }
-    };
-
-    const fetchLiveStreams = async () => {
-      try {
-        const response = await axios.get(`${apiBaseUrl}/api/live-stream`);
-        setLiveStreams(response.data);
-      } catch (err) {
-        console.error('Error fetching live streams:', err);
-      }
-    };
-
-    fetchFeaturedProducts();
-    authenticateWithYouTube().then(() => {
-      fetchLiveStreams();
-    });
-  }, [apiBaseUrl]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    if (isAuthenticated !== null) {
+      setIsLoading(false);
     }
+  }, [isAuthenticated]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [profilesRes, productsRes, streamsRes] = await Promise.all([
+          axios.get(`${apiBaseUrl}/api/auth/profiles`),
+          axios.get(`${apiBaseUrl}/api/selected-products`),
+          axios.get(`${apiBaseUrl}/live`),
+        ]);
 
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+        setInfluencers(
+          profilesRes.data.filter((user) => user.role === "influencer")
+        );
+        setFeaturedProducts(productsRes.data);
+        setLiveStreams(streamsRes.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
-    const type = () => {
+    const typeEffect = () => {
       const word = words[wordIndex];
-
-      if (isDeleting) {
-        setCurrentWord((prev) => word.substring(0, prev.length - 1));
-        if (currentWord.length === 0) {
-          setIsDeleting(false);
-          setWordIndex((prev) => (prev + 1) % words.length);
-        }
-      } else {
-        setCurrentWord((prev) => word.substring(0, prev.length + 1));
-        if (currentWord === word) {
-          setIsDeleting(true);
-        }
+      setCurrentWord((prev) =>
+        isDeleting
+          ? word.substring(0, prev.length - 1)
+          : word.substring(0, prev.length + 1)
+      );
+      if (!isDeleting && currentWord === word) {
+        setIsDeleting(true);
+      } else if (isDeleting && currentWord === "") {
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % words.length);
       }
     };
 
     const typingSpeed = isDeleting ? 50 : 100;
-    const timer = setTimeout(type, typingSpeed);
-
+    const timer = setTimeout(typeEffect, typingSpeed);
     return () => clearTimeout(timer);
-  }, [currentWord, isDeleting, wordIndex, words]);
+  }, [currentWord, isDeleting, wordIndex]);
 
-  const handleAddToCart = async (product) => {
-    try {
-      const existingItemResponse = await axios.get(`${apiBaseUrl}/api/cart/${product._id}`);
-      const existingItem = existingItemResponse.data;
-      if (existingItem) {
-        const updatedQuantity = existingItem.quantity + 1;
-        const updateResponse = await axios.put(`${apiBaseUrl}/api/cart/update/${product._id}`, {
-          quantity: updatedQuantity,
-        });
-        alert(updateResponse.data.message || 'Product quantity updated in the cart.');
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        try {
-          const addResponse = await axios.post(`${apiBaseUrl}/api/cart/add`, {
-            productId: product._id,
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            image: product.image,
-            type: product.type,
-            rating: product.rating,
-            stage: 'AddedToCart',
-            quantity: 1,
-          });
-          alert(addResponse.data.message || 'Product added to the cart.');
-        } catch (addError) {
-          console.error('Error adding product to the cart:', addError);
-          alert('Failed to add product to cart.');
-        }
-      } else {
-        console.error('Error checking cart:', error);
-        alert('Failed to check product in cart.');
-      }
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollAmount = clientWidth * 0.7;
+      scrollRef.current.scrollTo({
+        left:
+          direction === "left"
+            ? scrollLeft - scrollAmount
+            : scrollLeft + scrollAmount,
+        behavior: "smooth",
+      });
     }
   };
-
+  const scrollProducts = (direction) => {
+    if (productScrollRef.current) {
+      const scrollAmount = productScrollRef.current.offsetWidth * 0.8;
+      productScrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
   return (
     <>
-      <div className="flex justify-center items-center bg-purple-50 h-[200px] mt-24">
+      <div className="flex justify-center items-center bg-purple-50 h-48 mt-24">
         <h1 className="text-5xl font-bold text-black">
-          {currentWord.split(' ').slice(0, -1).join(' ')}{' '}
-          <span className="text-purple-500">{currentWord.split(' ').slice(-1)}</span>
+          {currentWord.split(" ").slice(0, -1).join(" ")}{" "}
+          <span className="text-purple-500">
+            {currentWord.split(" ").slice(-1)}
+          </span>
         </h1>
       </div>
-      <div className="mb-12 mt-20">
-        <Slider {...sliderSettings}>
-          {carouselImages.map((image, index) => (
-            <div key={index}>
-              <img src={image} alt={`Banner ${index + 1}`} className="w-full h-[500px] object-cover rounded-lg" />
-            </div>
-          ))}
-        </Slider>
+
+      <div className="bg-purple-100 p-8 flex flex-col md:flex-row justify-between">
+        <div className="md:w-1/2 mb-4">
+          <h1 className="text-2xl font-bold leading-relaxed w-[28vw]">
+            We've built the first online platform for live streaming and home
+            shopping shows with a built-in buying experience that anyone can
+            use.
+          </h1>
+          {
+            isAuthenticated &&
+            role?.trim().toLowerCase() === "influencer" && (
+              <div className="flex gap-4 mt-4">
+                <button
+                 onClick={() => navigate("/live")}
+                  className="text-white bg-gradient-to-r from-purple-500 to-purple-700 hover:bg-purple-600 font-medium rounded-lg text-sm px-5 py-2.5"
+                >
+                  Go Live
+                </button>
+               
+                <button
+                  onClick={() => navigate("/manual-live")}
+                  className="text-white bg-gradient-to-r from-purple-500 to-purple-700 hover:bg-purple-600 font-medium rounded-lg text-sm px-5 py-2.5"
+                >
+                  Add Live From Youtube
+                </button>
+              </div>
+            )}
+        </div>
+        <div className="md:w-1/2 overflow-hidden rounded-lg">
+          <iframe
+            width="100%"
+            height="315"
+            src="https://assets.talkshop.live/uploads/homepage_sizzle_reel.mp4"
+            title="Live Stream"
+            frameBorder="0"
+            allowFullScreen
+            className="rounded-lg"
+          ></iframe>
+        </div>
       </div>
 
-      <header className="bg-white p-5 rounded-lg mb-5">
-        <div className="flex justify-center overflow-hidden">
-          <h2 className="text-4xl font-bold text-black animate-slide-in whitespace-nowrap">
-            Upcoming Live Stream
+      {[
+        { title: "Live Stream", status: "live"  },
+        { title: "Upcoming Live Stream", status: "upcoming" || "ready" },
+        { title: "Past Live Stream", status: "complete" },
+        { title: "Recent Live Stream", status: "complete" },
+      ].map(({ title, status }) => (
+        <section key={title} className="container mx-auto p-4">
+          <h2 className="text-4xl font-bold text-black text-center mb-5">
+            {title}
           </h2>
-        </div>
-        <div className="flex justify-center">
-          {liveStreams.length > 0 ? (
-            liveStreams.map((stream) => (
-              <div key={stream.id} className="rounded-lg shadow-lg bg-white max-w-sm m-4">
-                <a href={`https://www.youtube.com/watch?v=${stream.id.videoId}`} target="_blank" rel="noopener noreferrer">
-                  <iframe
-                    className="w-full rounded-t-lg"
-                    src={`https://www.youtube.com/embed/${stream.id.videoId}`}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    title={stream.snippet.title}
-                    style={{ height: '240px' }} // Set the height for the iframe
-                  ></iframe>
-                </a>
-                <div className="p-6">
-                  <h5 className="text-gray-900 text-xl font-medium mb-2">{stream.snippet.title}</h5>
-                  <p className="text-gray-700 text-base mb-4">{stream.snippet.description}</p>
-                  <p className="text-gray-600 text-sm mb-4">Start Time: {new Date(stream.snippet.publishTime).toLocaleString()}</p>
-                  <button
-                    type="button"
-                    className="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800">
-                    Join Live
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="flex justify-center overflow-hidden">
-              <p>No upcoming live streams available.</p>
+          {liveStreams.filter((stream) => stream.status === status).length >
+          0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {liveStreams
+                .filter((stream) => stream.status === status)
+                .map((stream) => (
+                  <LiveStreamCard
+                    key={stream._id}
+                    link={`/video${stream.status === "live" ? "/live" : ""}/${
+                      stream.streamId
+                    }`}
+                    stream={stream}
+                    apiBaseUrl={apiBaseUrl}
+                  />
+                ))}
             </div>
+          ) : (
+            <p className="text-gray-500 text-center">
+              No {title.toLowerCase()} available.
+            </p>
           )}
-        </div>
+        </section>
+      ))}
 
+      <section className="container mx-auto p-4">
+        <h2 className="text-4xl font-bold text-black text-center mb-5">
+          Top Influencers
+        </h2>
+        <div className="relative w-full overflow-hidden p-4">
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto gap-6 p-4 scrollbar-hide"
+          >
+            {influencers.map((influencer) => (
+              <div
+                key={influencer._id}
+                className="flex flex-col items-center min-w-[140px]"
+              >
+                <img
+                  src={`${apiBaseUrl}${influencer.profilePicture}`}
+                  alt={influencer.name}
+                  className="w-52 h-52 rounded-full border-2 border-purple-300"
+                />
+                <button
+                  onClick={() => navigate(`/influencer/${influencer._id}`)}
+                  className="mt-2 text-md font-semibold text-black hover:text-purple-400"
+                >
+                  {influencer.name}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      <div className="bg-white p-5 rounded-lg mb-5">
         <div className="flex justify-center overflow-hidden">
           <h2 className="text-4xl font-bold text-black animate-slide-in whitespace-nowrap">
             Featured Products
           </h2>
         </div>
-        <div className="relative flex flex-col items-center justify-center min-h-screen">
+        <div className="relative flex flex-col items-center justify-center w-full mt-4">
+          {/* Scroll Left Button */}
+          <button
+            className="absolute left-0 z-10 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition md:block"
+            onClick={() => scrollProducts("left")}
+          >
+            <ChevronLeft size={32} />
+          </button>
+
+          {/* Scrollable Products Container */}
           <div
-            ref={sectionRef}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center"
+            ref={productScrollRef}
+            className="flex overflow-x-scroll scrollbar-hide space-x-7 p-4 w-full snap-x snap-mandatory"
+            style={{ scrollBehavior: "smooth", display: "flex" }}
           >
             {featuredProducts.length > 0 ? (
-              featuredProducts.map((product, index) => (
-
+              featuredProducts.map((product) => (
                 <div
                   key={product._id}
-                  className={`shadow-lg rounded-xl p-4 transition-transform transform 
-                      ${isVisible ? 'animate-slide-in' : 'opacity-0'}
-                      ${Math.floor(index / 3) % 2 === 0 ? (index % 3 === 0 ? 'translate-x-[-100%]' : 'translate-x-0') : (index % 3 === 0 ? 'translate-x-0' : 'translate-x-[100%]')}`}
-                  style={{
-                    animationDelay: `${(index % 3) * 0.2}s`,
-                    opacity: isVisible ? 1 : 0,
-                  }}
+                  className="snap-start w-1/5 min-w-[250px]"
                 >
-                  <div className="relative w-full aspect-square mb-3 overflow-hidden transition-transform duration-300 transform hover:scale-105">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full"
-                    />
-                    <div className="absolute flex flex-col top-0 right-0 p-3">
-                      <button className="transition ease-in duration-300 bg-gray-800 hover:text-purple-500 shadow hover:shadow-md text-gray-500 rounded-full w-8 h-8 text-center p-1">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex-auto justify-evenly">
-                    <div className="flex flex-wrap">
-                      <div className="w-full flex-none text-sm flex items-center text-gray-600">
-                        <div className="flex items-center mb-2 mt-2">
-                          {Array.from({ length: 5 }, (_, index) => (
-                            <svg
-                              key={index}
-                              className={`w-4 h-4 ${index < Math.floor(product.rating)
-                                  ? 'text-yellow-300'
-                                  : 'text-gray-300 dark:text-gray-500'
-                                } ms-1`}
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="currentColor"
-                              viewBox="0 0 22 20"
-                            >
-                              <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                            </svg>
-                          ))}
-                        </div>
-                      </div>
-                      <Link
-      to={`/product/${product._id}`}
-    >
-                      <div className="flex items-center w-full justify-between min-w-0">
-                        <h2 className="text-lg mr-auto cursor-pointer text-black-200 hover:text-purple-500 truncate">
-                          {product.name}
-                        </h2>
-                      </div>
-                      </Link>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                        ₹{product.price}
-                      </span>
-                      <button
-                        className="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800"
-                        onClick={() => handleAddToCart(product)}
-                      >
-                        Add to cart
-                      </button>
-                    </div>
-                  </div>
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    // imageUrl={product.image}
+                    isVisible={true}
+                  />
                 </div>
               ))
             ) : (
-              <p className="text-white">No featured products available.</p>
+              <p className="text-black">No featured products available.</p>
             )}
           </div>
+
+          {/* Scroll Right Button */}
+          <button
+            className="absolute right-0 z-10 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition md:block"
+            onClick={() => scrollProducts("right")}
+          >
+            <ChevronRight size={32} />
+          </button>
         </div>
-      </header>
+      </div>
+      <AuthModal />
     </>
   );
-}
+};
 
 export default LandingPage;

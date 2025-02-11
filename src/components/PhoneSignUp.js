@@ -21,6 +21,7 @@ const SignInButton = ({onClose}) => {
                     { user_json_url: userJsonUrl,user_json_phone:phone },
                     { withCredentials: true } // Send cookies with the request
                 );
+                window.location.href =`${apiBaseUrl}/auth/youtube`
                 onClose()
             } catch (err) {
                 console.error('Error during verification:', err.message);
