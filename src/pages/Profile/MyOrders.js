@@ -19,29 +19,38 @@ function MyOrders() {
   }, [apiBaseUrl]);
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-        <h2 className="text-4xl mb-3 flex justify-center font-bold text-black animate-slide-in whitespace-nowrap">
-      
+    <div className="max-w-4xl mx-auto p-6 md:p-8">
+      <h2 className="text-2xl md:text-4xl mb-6 text-center font-bold text-black animate-slide-in">
         My Orders
-     </h2>
-      <div className="space-y-4">
+      </h2>
+      <div className="space-y-6">
         {cartItems.length > 0 ? (
           cartItems.map((item) => (
-            <div key={item.productId} className="flex items-start bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow duration-300">
-              <img
-                src={`${apiBaseUrl}${item.image}`}
-                alt={item.name}
-                className="w-24 h-24 object-cover rounded-lg mr-4"
-              />
-              <div className="flex-grow">
-                <h6 className="text-lg font-semibold text-gray-800">{item.name}</h6>
-                <div className="flex justify-between mt-2">
-                  <span className="text-gray-600">Price: ₹{item.price}</span>
-                  <span className="text-gray-600">Quantity: {item.quantity}</span>
+            <div 
+              key={item.productId} 
+              className="bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-[1.02]"
+            >
+              {/* Status Bar */}
+              <div className="bg-purple-600 text-white text-center text-xs font-semibold py-2">
+                {item.stage}
+              </div>
+
+              <div className="flex flex-col md:flex-row items-center md:items-start p-4 gap-4">
+                {/* Product Image */}
+                <img
+                  src={`${apiBaseUrl}${item.image}`}
+                  alt={item.name}
+                  className="w-full sm:w-32 sm:h-32 object-cover rounded-lg"
+                />
+                
+                {/* Product Info */}
+                <div className="flex flex-col w-full">
+                  <h6 className="text-lg font-semibold text-gray-800">{item.name}</h6>
+                  <div className="flex justify-between text-sm text-gray-600 mt-2">
+                    <span>Price: ₹{item.price}</span>
+                    <span>Quantity: {item.quantity}</span>
+                  </div>
                 </div>
-                <span className="inline-block mt-2 bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white text-xs font-bold rounded-full px-2 py-1">
-                  {item.stage}
-                </span>
               </div>
             </div>
           ))

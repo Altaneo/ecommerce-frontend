@@ -25,6 +25,17 @@ const LandingPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showArrows, setShowArrows] = useState(false);
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollRef.current) {
+        setShowArrows(scrollRef.current.scrollWidth > scrollRef.current.clientWidth);
+      }
+    };
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [influencers])
   const words = ["Welcome to your", "social-selling", "Network!"];
   useEffect(() => {
     if (isAuthenticated !== null) {
@@ -96,6 +107,12 @@ const LandingPage = () => {
       });
     }
   };
+  const scrollInfluencers = (direction) => {
+    if (scrollRef.current) {
+      const cardWidth = scrollRef.current.firstChild?.offsetWidth || 0;
+      scrollRef.current.scrollBy({ left: direction === "left" ? -cardWidth : cardWidth, behavior: "smooth" });
+    }
+  };
   return (
     <>
       <div className="flex justify-center items-center bg-purple-50 h-48 mt-24">
@@ -107,37 +124,35 @@ const LandingPage = () => {
         </h1>
       </div>
 
-      <div className="bg-purple-100 p-8 flex flex-col md:flex-row justify-between">
-        <div className="md:w-1/2 mb-4">
-          <h1 className="text-2xl font-bold leading-relaxed w-[28vw]">
+      <div className="bg-purple-100 p-4 md:p-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="w-full md:w-1/2 mb-4 text-center md:text-left">
+          <h1 className="text-xl md:text-2xl font-bold leading-relaxed max-w-md">
             We've built the first online platform for live streaming and home
             shopping shows with a built-in buying experience that anyone can
             use.
           </h1>
-          {
-            isAuthenticated &&
-            role?.trim().toLowerCase() === "influencer" && (
-              <div className="flex gap-4 mt-4">
-                <button
-                 onClick={() => navigate("/live")}
-                  className="text-white bg-gradient-to-r from-purple-500 to-purple-700 hover:bg-purple-600 font-medium rounded-lg text-sm px-5 py-2.5"
-                >
-                  Go Live
-                </button>
-               
-                <button
-                  onClick={() => navigate("/manual-live")}
-                  className="text-white bg-gradient-to-r from-purple-500 to-purple-700 hover:bg-purple-600 font-medium rounded-lg text-sm px-5 py-2.5"
-                >
-                  Add Live From Youtube
-                </button>
-              </div>
-            )}
+          {isAuthenticated && role?.trim().toLowerCase() === "influencer" && (
+            <div className="flex flex-col md:flex-row gap-4 mt-4 justify-center md:justify-start">
+              <button
+                onClick={() => navigate("/live")}
+                className="text-white bg-gradient-to-r from-purple-500 to-purple-700 hover:bg-purple-600 font-medium rounded-lg text-sm px-5 py-2.5 w-full md:w-auto"
+              >
+                Go Live
+              </button>
+
+              <button
+                onClick={() => navigate("/manual-live")}
+                className="text-white bg-gradient-to-r from-purple-500 to-purple-700 hover:bg-purple-600 font-medium rounded-lg text-sm px-5 py-2.5 w-full md:w-auto"
+              >
+                Add Live From Youtube
+              </button>
+            </div>
+          )}
         </div>
-        <div className="md:w-1/2 overflow-hidden rounded-lg">
+        <div className="w-full md:w-1/2 overflow-hidden rounded-lg">
           <iframe
             width="100%"
-            height="315"
+            height="250"
             src="https://assets.talkshop.live/uploads/homepage_sizzle_reel.mp4"
             title="Live Stream"
             frameBorder="0"
@@ -148,7 +163,7 @@ const LandingPage = () => {
       </div>
 
       {[
-        { title: "Live Stream", status: "live"  },
+        { title: "Live Stream", status: "live" },
         { title: "Upcoming Live Stream", status: "upcoming" || "ready" },
         { title: "Past Live Stream", status: "complete" },
         { title: "Recent Live Stream", status: "complete" },
@@ -180,47 +195,71 @@ const LandingPage = () => {
           )}
         </section>
       ))}
+<section className="container mx-auto p-4">
+      <h2 className="text-4xl font-bold text-black text-center mb-5">
+        Top Influencers
+      </h2>
 
-      <section className="container mx-auto p-4">
-        <h2 className="text-4xl font-bold text-black text-center mb-5">
-          Top Influencers
-        </h2>
-        <div className="relative w-full overflow-hidden p-4">
-          <div
-            ref={scrollRef}
-            className="flex overflow-x-auto gap-6 p-4 scrollbar-hide"
+      <div className="relative w-full overflow-hidden p-4 flex items-center">
+        {/* Left Scroll Button - Shown when scrolling is needed */}
+        {showArrows && (
+          <button
+            className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition"
+            onClick={() => scrollInfluencers("left")}
           >
-            {influencers.map((influencer) => (
-              <div
-                key={influencer._id}
-                className="flex flex-col items-center min-w-[140px]"
+            <ChevronLeft size={32} />
+          </button>
+        )}
+
+        {/* Scrollable Influencers Container */}
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto scrollbar-hide gap-6 p-4 w-full snap-x snap-mandatory"
+          style={{ scrollBehavior: "smooth" }}
+        >
+          {influencers.map((influencer) => (
+            <div
+              key={influencer._id}
+              className="snap-center w-full sm:w-auto flex flex-col items-center min-w-[80vw] sm:min-w-[200px]"
+            >
+              <img
+                src={`${apiBaseUrl}${influencer.profilePicture}`}
+                alt={influencer.name}
+                className="w-52 h-52 rounded-full border-2 border-purple-300 transition-transform duration-300 ease-in-out transform hover:scale-110"
+              />
+              <button
+                onClick={() => navigate(`/influencer/${influencer._id}`)}
+                className="mt-2 text-md font-semibold text-black hover:text-purple-400"
               >
-                <img
-                  src={`${apiBaseUrl}${influencer.profilePicture}`}
-                  alt={influencer.name}
-                  className="w-52 h-52 rounded-full border-2 border-purple-300"
-                />
-                <button
-                  onClick={() => navigate(`/influencer/${influencer._id}`)}
-                  className="mt-2 text-md font-semibold text-black hover:text-purple-400"
-                >
-                  {influencer.name}
-                </button>
-              </div>
-            ))}
-          </div>
+                {influencer.name}
+              </button>
+            </div>
+          ))}
         </div>
-      </section>
+
+        {/* Right Scroll Button - Shown when scrolling is needed */}
+        {showArrows && (
+          <button
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition"
+            onClick={() => scrollInfluencers("right")}
+          >
+            <ChevronRight size={32} />
+          </button>
+        )}
+      </div>
+    </section>
+
       <div className="bg-white p-5 rounded-lg mb-5">
         <div className="flex justify-center overflow-hidden">
           <h2 className="text-4xl font-bold text-black animate-slide-in whitespace-nowrap">
             Featured Products
           </h2>
         </div>
+
         <div className="relative flex flex-col items-center justify-center w-full mt-4">
           {/* Scroll Left Button */}
           <button
-            className="absolute left-0 z-10 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition md:block"
+            className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition"
             onClick={() => scrollProducts("left")}
           >
             <ChevronLeft size={32} />
@@ -229,21 +268,16 @@ const LandingPage = () => {
           {/* Scrollable Products Container */}
           <div
             ref={productScrollRef}
-            className="flex overflow-x-scroll scrollbar-hide space-x-7 p-4 w-full snap-x snap-mandatory"
+            className="flex overflow-x-scroll scrollbar-hide space-x-7 p-1 w-full snap-x snap-mandatory"
             style={{ scrollBehavior: "smooth", display: "flex" }}
           >
             {featuredProducts.length > 0 ? (
               featuredProducts.map((product) => (
                 <div
                   key={product._id}
-                  className="snap-start w-1/5 min-w-[250px]"
+                  className="snap-start w-full md:w-1/5 min-w-[100%] md:min-w-[250px] flex justify-center"
                 >
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    // imageUrl={product.image}
-                    isVisible={true}
-                  />
+                  <ProductCard product={product} isVisible={true} />
                 </div>
               ))
             ) : (
@@ -253,13 +287,14 @@ const LandingPage = () => {
 
           {/* Scroll Right Button */}
           <button
-            className="absolute right-0 z-10 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition md:block"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition"
             onClick={() => scrollProducts("right")}
           >
             <ChevronRight size={32} />
           </button>
         </div>
       </div>
+
       <AuthModal />
     </>
   );

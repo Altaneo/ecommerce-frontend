@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import ProductCard from "./ProductCard";
+
 const Dashboard = () => {
   const { broadcastId } = useParams();
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
@@ -16,39 +17,44 @@ const Dashboard = () => {
     if (!broadcastId) return;
     const fetchData = async () => {
       try {
-        // Fetch Live Stream Data and Check Live Status
-        const [streamResponse,statusResponse] = await Promise.all([
+        const [streamResponse, statusResponse] = await Promise.all([
           axios.get(`${apiBaseUrl}/live/${broadcastId}`),
-          axios.get(`${apiBaseUrl}/api/check-live-status/${broadcastId}`)
+          axios.get(`${apiBaseUrl}/api/check-live-status/${broadcastId}`),
         ]);
-    
+
         setStream(streamResponse.data);
         setStatus(statusResponse.data.status);
-    
-        const { data: chatData } = await axios.get(`${apiBaseUrl}/get-live-chat/${broadcastId}`, { withCredentials: true });
+
+        const { data: chatData } = await axios.get(
+          `${apiBaseUrl}/get-live-chat/${broadcastId}`,
+          { withCredentials: true }
+        );
         setChatMessages(chatData);
-    
-        await axios.put(`${apiBaseUrl}/live/update/${broadcastId}`, { status: statusResponse.data.status });
+
+        await axios.put(`${apiBaseUrl}/live/update/${broadcastId}`, {
+          status: statusResponse.data.status,
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
-    
 
     fetchData();
-    const interval = setInterval(fetchData, 10000); // Refresh every 10s
+    const interval = setInterval(fetchData, 10000);
 
     return () => clearInterval(interval);
   }, [broadcastId]);
 
-  // Function to send a message to the YouTube live chat
   const sendMessage = async () => {
     if (!message.trim()) return;
-
     try {
-      await axios.post(`${apiBaseUrl}/send-chat`, { message }, { withCredentials: true });
+      await axios.post(
+        `${apiBaseUrl}/send-chat`,
+        { message },
+        { withCredentials: true }
+      );
       setMessage("");
     } catch (error) {
       console.error("Error sending chat message:", error);
@@ -70,14 +76,16 @@ const Dashboard = () => {
       </div>
     );
   }
-console.log(stream.liveChatId,"stream=======")
+
   return (
-    <div className="p-6 mt-24">
-      <h1 className="text-2xl font-bold mb-4">Live Stream Dashboard</h1>
-      <div className="flex mt-4">
-        <div className="w-3/4 pr-4"> 
+    <div className="p-4 md:p-6 mt-16">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 text-center">Live Stream Dashboard</h1>
+      
+      <div className="flex flex-col md:flex-row gap-4">
+        {/* Video Section */}
+        <div className="w-full md:w-3/4">
           <iframe
-            className="w-full h-80 md:h-96"
+            className="w-full h-56 sm:h-72 md:h-96 rounded-lg"
             src={`https://www.youtube.com/embed/${broadcastId}?autoplay=1`}
             title="Live Stream"
             frameBorder="0"
@@ -85,21 +93,21 @@ console.log(stream.liveChatId,"stream=======")
             allowFullScreen
           ></iframe>
         </div>
-        <div className="w-1/4 h-80 md:h-150"> {/* 30% Width for Live Chat */}
+
+        {/* Chat Section */}
+        <div className="w-full md:w-1/4">
           <iframe
-            width="100%"
-            height="500"
+            className="w-full h-56 sm:h-72 md:h-96 rounded-lg shadow-lg"
             src={`https://www.youtube.com/live_chat?v=${broadcastId}&embed_domain=localhost`}
             title="Live Chat"
             frameBorder="0"
             allowFullScreen
-            className="rounded-lg shadow-lg"
           ></iframe>
         </div>
       </div>
-      {/* <LiveChat liveVideoId={broadcastId} liveChatId={stream.liveChatId}/> */}
+
       {/* Product Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
         {stream?.products?.map((product, index) => (
           <ProductCard
             key={product._id || index}

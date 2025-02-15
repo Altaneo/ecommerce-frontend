@@ -1,12 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 .App {
   text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
+  height: 40vmin; /* Responsive size */
   pointer-events: none;
 }
 
@@ -23,12 +24,32 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(10px + 2vmin); /* Responsive font size */
   color: white;
+  padding: 0 1rem; /* Added padding for small screens */
 }
 
 .App-link {
   color: #61dafb;
+}
+
+/* Additional Responsive Styles */
+@media (max-width: 640px) {
+  .App-header {
+    font-size: calc(10px + 4vmin); /* Increased font size for smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .App-header {
+    padding: 0 2rem; /* More padding for medium screens */
+  }
+}
+
+@media (min-width: 768px) {
+  .App-header {
+    padding: 0 4rem; /* More padding for larger screens */
+  }
 }
 
 @keyframes App-logo-spin {

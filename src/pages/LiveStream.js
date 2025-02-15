@@ -250,7 +250,7 @@ const LivestreamForm = () => {
     }
   };
   return (
-    <div className="p-6 mt-24">
+    <>
       {!broadcastId ? (
         <form
           onSubmit={startLiveStream}
@@ -500,7 +500,7 @@ const LivestreamForm = () => {
           </form>
         </div>
       )}
-    </div>
+      </>
   );
 };
 

@@ -151,7 +151,7 @@ function CartPage() {
             .map((item) => (
               <div
                 key={item.productId}
-                className="group relative flex items-center gap-12 p-4 border rounded-lg bg-white mb-4 overflow-hidden"
+                className="group relative flex items-center gap-12 border rounded-lg bg-white mb-4 overflow-hidden"
               >
                 <img
                   src={`${apiBaseUrl}${item.image}`}
@@ -261,73 +261,74 @@ function CartPage() {
         )}
       </div>
       {(cartItems.length > 0 && !isOrderConfirmed) &&(
-      <div className="w-1/3 p-6 border rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg">
-        <h2 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">
-          Price Details
-        </h2>
-        <div className="text-sm mb-4 flex justify-between items-center">
-          <span className="text-gray-600">Total Price:</span>
-          <span className="text-gray-800 font-medium">₹{priceDetails.totalPrice}</span>
-        </div>
-        <div className="text-sm mb-4 flex justify-between items-center">
-          <span className="text-gray-600">Discount:</span>
-          <span className="text-red-500 font-medium">-₹{priceDetails.discount}</span>
-        </div>
-        <div className="text-sm mb-4 flex justify-between items-center">
-          <span className="text-gray-600">Delivery Charges:</span>
-          <span className="text-gray-800 font-medium">
-            ₹{priceDetails.deliveryCharges > 0 ? priceDetails.deliveryCharges : 'Free'}
-          </span>
-        </div>
-        <hr className="my-4 border-gray-300" />
-        <div className="text-base font-semibold flex justify-between items-center text-gray-900 mb-4">
-          <span>Final Amount:</span>
-          <span className="text-purple-600">₹{priceDetails.finalAmount}</span>
-        </div>
-        <div className="mt-6">
-          <h3 className="text-base font-semibold text-white mb-4 px-4 py-2 rounded bg-gradient-to-r from-purple-500 to-purple-700 shadow text-center">
-            Payment Methods
-          </h3>
-          <div className="flex flex-wrap items-center justify-center gap-6 bg-purple-50 p-4 rounded-lg shadow-sm">
-            {/* UPI Icon */}
-            <div className="flex flex-col items-center">
-              <img
-                src="/images/upi.png"
-                alt="UPI"
-                className="w-24 h-12 transition-transform transform hover:scale-105"
-              />
-              <span className="text-sm text-gray-600 mt-2">UPI</span>
-            </div>
-            {/* Visa Icon */}
-            <div className="flex flex-col items-center">
-              <img
-                src="/images/visa.png"
-                alt="Visa"
-                className="w-24 h-12 transition-transform transform hover:scale-105"
-              />
-              <span className="text-sm text-gray-600 mt-2">Visa</span>
-            </div>
-            {/* MasterCard Icon */}
-            <div className="flex flex-col items-center">
-              <img
-                src="/images/mastercard.png"
-                alt="MasterCard"
-                className="w-24 h-12 transition-transform transform hover:scale-105"
-              />
-              <span className="text-sm text-gray-600 mt-2">MasterCard</span>
-            </div>
-            {/* RuPay Icon */}
-            <div className="flex flex-col items-center">
-              <img
-                src="/images/rupay.png"
-                alt="RuPay"
-                className="w-24 h-12 transition-transform transform hover:scale-105"
-              />
-              <span className="text-sm text-gray-600 mt-2">RuPay</span>
-            </div>
-          </div>
-        </div>
-      </div>
+     <div className="w-full sm:w-1/2 md:w-1/3 p-4 sm:p-6 border rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg">
+     <h2 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">
+       Price Details
+     </h2>
+     <div className="text-sm mb-4 flex justify-between items-center">
+       <span className="text-gray-600">Total Price:</span>
+       <span className="text-gray-800 font-medium">₹{priceDetails.totalPrice}</span>
+     </div>
+     <div className="text-sm mb-4 flex justify-between items-center">
+       <span className="text-gray-600">Discount:</span>
+       <span className="text-red-500 font-medium">-₹{priceDetails.discount}</span>
+     </div>
+     <div className="text-sm mb-4 flex justify-between items-center">
+       <span className="text-gray-600">Delivery Charges:</span>
+       <span className="text-gray-800 font-medium">
+         ₹{priceDetails.deliveryCharges > 0 ? priceDetails.deliveryCharges : 'Free'}
+       </span>
+     </div>
+     <hr className="my-4 border-gray-300" />
+     <div className="text-base font-semibold flex justify-between items-center text-gray-900 mb-4">
+       <span>Final Amount:</span>
+       <span className="text-purple-600">₹{priceDetails.finalAmount}</span>
+     </div>
+     <div className="mt-6">
+       <h3 className="text-base font-semibold text-white mb-4 px-4 py-2 rounded bg-gradient-to-r from-purple-500 to-purple-700 shadow text-center">
+         Payment Methods
+       </h3>
+       <div className="flex flex-wrap items-center justify-center gap-4 bg-purple-50 p-4 rounded-lg shadow-sm">
+         {/* UPI Icon */}
+         <div className="flex flex-col items-center">
+           <img
+             src="/images/upi.png"
+             alt="UPI"
+             className="w-20 h-10 transition-transform transform hover:scale-105"
+           />
+           <span className="text-sm text-gray-600 mt-2">UPI</span>
+         </div>
+         {/* Visa Icon */}
+         <div className="flex flex-col items-center">
+           <img
+             src="/images/visa.png"
+             alt="Visa"
+             className="w-20 h-10 transition-transform transform hover:scale-105"
+           />
+           <span className="text-sm text-gray-600 mt-2">Visa</span>
+         </div>
+         {/* MasterCard Icon */}
+         <div className="flex flex-col items-center">
+           <img
+             src="/images/mastercard.png"
+             alt="MasterCard"
+             className="w-20 h-10 transition-transform transform hover:scale-105"
+           />
+           <span className="text-sm text-gray-600 mt-2">MasterCard</span>
+         </div>
+         {/* RuPay Icon */}
+         <div className="flex flex-col items-center">
+           <img
+             src="/images/rupay.png"
+             alt="RuPay"
+             className="w-20 h-10 transition-transform transform hover:scale-105"
+           />
+           <span className="text-sm text-gray-600 mt-2">RuPay</span>
+         </div>
+       </div>
+     </div>
+   </div>
+   
        )}
       <AuthModal open={modalOpen} type={authType} onClose={handleCloseModal} />
     </div>

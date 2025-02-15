@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
   const handleCloseModal = () => {
     setModalOpen(false);
   };
+
   return (
     <AuthContext.Provider value={{ authType, modalOpen, role, handleOpenModal,isAuthenticated }}>
       {children}

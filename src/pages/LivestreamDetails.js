@@ -69,7 +69,7 @@ const LivestreamDetails = () => {
   };
 
   return (
-    <div className="mx-auto mt-24 p-6 text-gray-900 rounded-lg shadow-xl">
+    <div className="mx-auto p-6 text-gray-900 rounded-lg shadow-xl">
       {/* Livestream Title & Description */}
       <h2 className="text-4xl font-bold text-purple-800">{livestream.title}</h2>
       <p className="text-gray-600 mt-2">{livestream.description}</p>
