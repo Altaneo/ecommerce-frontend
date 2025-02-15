@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const ProductDetails = () => {
-  const { productId } = useParams();
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState("");
@@ -20,7 +20,7 @@ const ProductDetails = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${apiBaseUrl}/api/products/${productId}`
+          `${apiBaseUrl}/api/products/${id}`
         );
         setProduct(response.data);
         setReviews(response.data.reviews || []);
@@ -32,7 +32,7 @@ const ProductDetails = () => {
       }
     };
     fetchProduct();
-  }, [productId]);
+  }, [id]);
 
   const handleAddToCart = async (product) => {
         try {
@@ -49,7 +49,7 @@ const ProductDetails = () => {
           if (error.response && error.response.status === 404) {
             try {
               const addResponse = await axios.post(`${apiBaseUrl}/api/cart/add`, {
-                productId: product._id,
+                id: product._id,
                 name: product.name,
                 description: product.description,
                 price: product.price,
@@ -73,7 +73,7 @@ const ProductDetails = () => {
 
   const handleAddReview = async () => {
         try {
-            const response = await axios.post(`${apiBaseUrl}/api/products/${productId}/reviews`, {
+            const response = await axios.post(`${apiBaseUrl}/api/products/${id}/reviews`, {
                 review: newReview,
                 rating: newRating,
             });

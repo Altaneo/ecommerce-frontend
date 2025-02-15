@@ -38,7 +38,7 @@ function App() {
         <Route path="/video/live/:broadcastId" element={<Dashboard />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/search" element={<SearchResults />} />
-        <Route path="/product/:productId" element={<ProductDetails />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/influencer/:id" element={<UserPage/>} />
         <Route path="/manual-live" element={<ManualLiveStream/>}/>
         <Route path="/livestream/:streamId" element={<LivestreamDetails />} />
