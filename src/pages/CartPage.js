@@ -292,7 +292,7 @@ function CartPage() {
          {/* UPI Icon */}
          <div className="flex flex-col items-center">
            <img
-             src="/images/upi.png"
+             src={`${apiBaseUrl}/uploads/upi.png`}
              alt="UPI"
              className="w-20 h-10 transition-transform transform hover:scale-105"
            />
@@ -301,7 +301,7 @@ function CartPage() {
          {/* Visa Icon */}
          <div className="flex flex-col items-center">
            <img
-             src="/images/visa.png"
+             src={`${apiBaseUrl}/uploads/visa.png`}
              alt="Visa"
              className="w-20 h-10 transition-transform transform hover:scale-105"
            />
@@ -310,7 +310,7 @@ function CartPage() {
          {/* MasterCard Icon */}
          <div className="flex flex-col items-center">
            <img
-             src="/images/mastercard.png"
+             src={`${apiBaseUrl}/uploads/mastercard.png`}
              alt="MasterCard"
              className="w-20 h-10 transition-transform transform hover:scale-105"
            />
@@ -319,7 +319,7 @@ function CartPage() {
          {/* RuPay Icon */}
          <div className="flex flex-col items-center">
            <img
-             src="/images/rupay.png"
+             src={`${apiBaseUrl}/uploads/rupay.png`}
              alt="RuPay"
              className="w-20 h-10 transition-transform transform hover:scale-105"
            />
