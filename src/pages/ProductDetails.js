@@ -24,7 +24,7 @@ const ProductDetails = () => {
         );
         setProduct(response.data);
         setReviews(response.data.reviews || []);
-        setAverageRating(response.data.averageRating || 0);
+        setAverageRating(response.data.averageRating || response.data.rating);
       } catch (err) {
         setError(err.message);
       } finally {
