@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const ProductDetails = () => {
   const { id } = useParams();
+ const { t, i18n } = useTranslation();
+ const currentLang = i18n.language || "en";
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState("");
@@ -43,7 +46,7 @@ const ProductDetails = () => {
             const updateResponse = await axios.put(`${apiBaseUrl}/api/cart/update/${product._id}`, {
               quantity: updatedQuantity,
             });
-            alert(updateResponse.data.message || 'Product quantity updated in the cart.');
+            alert(updateResponse.data.message || `${t("PRODUCT_QUANTITY")}`);
           }
         } catch (error) {
           if (error.response && error.response.status === 404) {
@@ -59,14 +62,13 @@ const ProductDetails = () => {
                 stage: 'AddedToCart',
                 quantity: 1,
               });
-              alert(addResponse.data.message || 'Product added to the cart.');
+              alert(addResponse.data.message || `${t("PRODUCT_ADDED")}`);
             } catch (addError) {
-              console.error('Error adding product to the cart:', addError);
-              alert('Failed to add product to cart.');
+              alert(`${t("FAILED_ADD_CART")}`);
             }
           } else {
-            console.error('Error checking cart:', error);
-            alert('Failed to check product in cart.');
+            console.error(`${t("FAILED_ADD_CART")}`, error);
+            alert(`${t("FAILED_ADD_CART")}`);
           }
         }
   };
@@ -87,10 +89,10 @@ const ProductDetails = () => {
             setNewReview('');
             setNewRating(0);
 
-            alert('Review submitted successfully.');
+            alert(`${t('REVIEW_SUBMITTED')}`);
         } catch (err) {
             console.error(err);
-            alert('Failed to submit review.');
+            alert(`${t('REVIEW_FAILED')}`);
         }
   };
 
@@ -127,24 +129,24 @@ const ProductDetails = () => {
         <div className="w-full md:w-1/2">
           <img
             src={`${apiBaseUrl}${product.image}`}
-            alt={product.name}
+            alt={product.name[currentLang]}
             className="w-full h-auto rounded-lg shadow-md"
           />
         </div>
         <div className="w-full md:w-1/2">
-          <h1 className="text-3xl font-bold">{product.name}</h1>
-          <p className="text-lg text-gray-600 mt-2">{product.description}</p>
+          <h1 className="text-3xl font-bold">{product.name[currentLang]}</h1>
+          <p className="text-lg text-gray-600 mt-2">{product.description[currentLang]}</p>
           <p className="text-2xl font-semibold mt-4">₹{product.price}</p>
           <button
             className="mt-4 bg-purple-600 text-white py-2 px-4 rounded w-full md:w-auto"
             onClick={() => handleAddToCart(product)}
           >
-            Add to Cart
+            {t("ADD_TO_CART")}
           </button>
           <div className="mt-8">
-            <h2 className="text-2xl font-bold">Reviews</h2>
+            <h2 className="text-2xl font-bold">{t("REVIEWS")}</h2>
             <div className="mt-2 flex items-center">
-              <span className="mr-2">Average Rating:</span>
+              <span className="mr-2">{t("AVERAGE_RATING")}:</span>
               <div className="flex">
                 {Array.from({ length: 5 }, (_, index) => (
                   <svg
@@ -180,17 +182,17 @@ const ProductDetails = () => {
                   </div>
                 ))
               ) : (
-                <p>No reviews yet. Be the first to review!</p>
+                <p>{t("NO_REVIEWS")}</p>
               )}
             </div>
             <div className="mt-8">
-              <h3 className="text-xl font-bold">Add a Review</h3>
+              <h3 className="text-xl font-bold">{t("ADD_REVIEW")}</h3>
               <textarea
                 className="w-full border p-2 rounded mt-2"
                 rows="4"
                 value={newReview}
                 onChange={(e) => setNewReview(e.target.value)}
-                placeholder="Write your review"
+                placeholder={t("WRITE_YOUR_REVIEW")}
               ></textarea>
               <div className="flex mt-4">
                 {Array(5)
@@ -214,14 +216,15 @@ const ProductDetails = () => {
                 className="mt-4 bg-purple-600 text-white py-2 px-4 rounded w-full md:w-auto"
                 onClick={handleAddReview}
               >
-                Submit Review
+                {t("SUBMIT_REVIEW")}
               </button>
+            </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
   );
+  
 };
 
 export default ProductDetails;

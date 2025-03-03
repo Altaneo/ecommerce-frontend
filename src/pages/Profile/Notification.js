@@ -1,8 +1,11 @@
+import { t } from "i18next";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AiOutlineCheckCircle, AiOutlineWarning, AiOutlineCloseCircle, AiOutlineInfoCircle } from 'react-icons/ai'; // Example icons
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
+  const {t} =useTranslation()
   const apiBaseUrl =
     process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
@@ -49,7 +52,7 @@ const Notifications = () => {
   return (
     <div className="bg-purple-50 min-h-screen px-4 py-6 sm:px-6 lg:px-8">
       <h2 className="text-2xl sm:text-4xl mb-4 text-center font-bold text-black animate-slide-in">
-        Notifications
+        {t("NOTIFICATIONS")}
       </h2>
       <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-5 sm:p-6">
         {notifications.length > 0 ? (
@@ -88,7 +91,7 @@ const Notifications = () => {
             ))}
           </ul>
         ) : (
-          <p className="text-center text-gray-500">No new notifications.</p>
+          <p className="text-center text-gray-500">{t("NO_NOTIFICATIONS")}</p>
         )}
       </div>
     </div>

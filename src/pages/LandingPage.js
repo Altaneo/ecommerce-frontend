@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import AuthModal from "../components/AuthModal";
 import LiveStreamCard from "../components/LiveStreamCard";
 import ProductCard from "../components/ProductCard";
-
+import { useTranslation } from "react-i18next";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -15,6 +15,8 @@ const apiBaseUrl =
 
 const LandingPage = () => {
   const { role, isAuthenticated } = useAuth();
+  
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const scrollRef = useRef(null);
   const productScrollRef = useRef(null);
@@ -36,7 +38,7 @@ const LandingPage = () => {
     window.addEventListener("resize", checkScroll);
     return () => window.removeEventListener("resize", checkScroll);
   }, [influencers])
-  const words = ["Welcome to your", "social-selling", "Network!"];
+  const words = [`${t("WELCOME_TO_YOUR")}`, `${t("SOCIAL_SELLING")}`,`${t("NETWORK")}`];
   useEffect(() => {
     if (isAuthenticated !== null) {
       setIsLoading(false);
@@ -127,9 +129,7 @@ const LandingPage = () => {
       <div className="bg-purple-100 p-4 md:p-8 flex flex-col md:flex-row justify-between items-center">
         <div className="w-full md:w-1/2 mb-4 text-center md:text-left">
           <h1 className="text-xl md:text-2xl font-bold leading-relaxed max-w-md">
-            We've built the first online platform for live streaming and home
-            shopping shows with a built-in buying experience that anyone can
-            use.
+           {t("LIVE_PAGE_HEADER")}
           </h1>
           {isAuthenticated && role?.trim().toLowerCase() === "influencer" && (
             <div className="flex flex-col md:flex-row gap-4 mt-4 justify-center md:justify-start">
@@ -137,14 +137,14 @@ const LandingPage = () => {
                 onClick={() => navigate("/live")}
                 className="text-white bg-gradient-to-r from-purple-500 to-purple-700 hover:bg-purple-600 font-medium rounded-lg text-sm px-5 py-2.5 w-full md:w-auto"
               >
-                Go Live
+                {t("GO_LIVE")}
               </button>
 
               <button
                 onClick={() => navigate("/manual-live")}
                 className="text-white bg-gradient-to-r from-purple-500 to-purple-700 hover:bg-purple-600 font-medium rounded-lg text-sm px-5 py-2.5 w-full md:w-auto"
               >
-                Add Live From Youtube
+                {t("ADD_LIVE_FROM_YOUTUBE")}
               </button>
             </div>
           )}
@@ -163,17 +163,16 @@ const LandingPage = () => {
       </div>
 
       {[
-        { title: "Live Stream", status: "live" },
-        { title: "Upcoming Live Stream", status: "upcoming" || "ready" },
-        { title: "Past Live Stream", status: "complete" },
-        { title: "Recent Live Stream", status: "complete" },
+       { title: `${t("LIVE_STREAM")}`, status: "live" },
+       { title: `${t("UPCOMING_LIVE_STREAM")}`, status: "ready" },
+       { title: `${t("PAST_LIVE_STREAM")}`, status: "complete" },
+       { title: `${t("RECENT_LIVE_STREAM")}`, status: "complete" },
       ].map(({ title, status }) => (
         <section key={title} className="container mx-auto p-4">
           <h2 className="text-4xl font-bold text-black text-center mb-5">
             {title}
           </h2>
-          {liveStreams.filter((stream) => stream.status === status).length >
-          0 ? (
+          {liveStreams.filter((stream) => stream.status === status).length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {liveStreams
                 .filter((stream) => stream.status === status)
@@ -190,14 +189,14 @@ const LandingPage = () => {
             </div>
           ) : (
             <p className="text-gray-500 text-center">
-              No {title.toLowerCase()} available.
+              {t(`NO_${title.toUpperCase().replace(/\s+/g, "_")}_AVAILABLE`)}
             </p>
           )}
         </section>
       ))}
 <section className="container mx-auto p-4">
       <h2 className="text-4xl font-bold text-black text-center mb-5">
-        Top Influencers
+      {t("TOP_INFLUENCERS")}
       </h2>
 
       <div className="relative w-full overflow-hidden p-4 flex items-center">
@@ -252,7 +251,7 @@ const LandingPage = () => {
       <div className="bg-white p-5 rounded-lg mb-5">
         <div className="flex justify-center overflow-hidden">
           <h2 className="text-4xl font-bold text-black animate-slide-in whitespace-nowrap">
-            Featured Products
+          {t("FEATURED_PRODUCTS")}
           </h2>
         </div>
 
@@ -277,11 +276,12 @@ const LandingPage = () => {
                   key={product._id}
                   className="snap-start w-full md:w-1/5 min-w-[100%] md:min-w-[250px] flex justify-center"
                 >
+                  
                   <ProductCard product={product} isVisible={true} />
                 </div>
               ))
             ) : (
-              <p className="text-black">No featured products available.</p>
+              <p className="text-black">{t("NO_FEATURE_PRODUCT")}</p>
             )}
           </div>
 

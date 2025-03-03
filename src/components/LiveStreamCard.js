@@ -1,6 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 const LiveStreamCard = ({ stream, apiBaseUrl,link }) => {
+  const { t ,i18n} = useTranslation();
+  const currentLang = i18n.language || "en";
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
       <a
@@ -15,17 +18,17 @@ const LiveStreamCard = ({ stream, apiBaseUrl,link }) => {
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            title={stream.title}
+            title={stream.title[currentLang]}
           ></iframe>
         </div>
       </a>
       <div className="p-4">
         <Link to={link} className="hover:underline text-lg font-semibold">
-          {stream.title}
+          {stream.title[currentLang]}
         </Link>
-        <p className="text-gray-700 text-sm mb-2 line-clamp-3">{stream.description}</p>
+        <p className="text-gray-700 text-sm mb-2 line-clamp-3">{stream.description[currentLang]}</p>
         <p className="text-gray-600 text-xs">
-          Start Time: {new Date(stream.startTime).toLocaleString()}
+          {t("START_TIME")}: {new Date(stream.startTime).toLocaleString()}
         </p>
       </div>
     </div>

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProductFilter from '../components/ProductLists';
-import { formatCategories } from '../utils/comman';
+import { useTranslation } from 'react-i18next';
 
 function BeautyPage() {
+  const {t}=useTranslation()
   const [products, setProducts] = useState([]); // State to store the products
   const [loading, setLoading] = useState(true); // State to handle loading
   const [error, setError] = useState(null); // State to handle errors
@@ -17,11 +18,10 @@ function BeautyPage() {
         setLoading(false); // Set loading to false
       })
       .catch((err) => {
-        console.error('Error fetching products:', err);
-        setError('Failed to fetch products.'); // Set error message
+        setError(t("FAILED_TO_FETCH")); // Set error message
         setLoading(false); // Set loading to false
       });
-  }, []); // Empty dependency array ensures the effect runs only once
+  }, []); 
 
   if (loading) {
     return (
@@ -32,15 +32,11 @@ function BeautyPage() {
   }
 
   if (error) {
-    return <p>{error}</p>; // Show error message if fetch fails
+    return <p>{error}</p>; 
   }
-
-  // Filter products by category where it equals 'beauty'
   const beautyProducts = products.filter((product) => product.category === 'beauty');
-
-  // Define the categories array to pass as props
   const categories = ['makeup', 'cream', 'hairdryer', 'shampoo'];
-  return <ProductFilter products={beautyProducts} categories={categories} />;
+  return <ProductFilter products={beautyProducts} categories={categories}/>;
 }
 
 export default BeautyPage;

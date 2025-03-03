@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react"; // Importing icons
+import { t } from "i18next";
 
 export const VideoDisplayPage = () => {
   const { videoId } = useParams();
@@ -37,8 +38,14 @@ export const VideoDisplayPage = () => {
     }
   }, [stream]);
 
-  if (loading) return <p className="text-center mt-20 text-lg">Loading...</p>;
-  if (!stream) return <p className="text-center mt-20 text-lg text-red-500">Live stream not found.</p>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  if (!stream) return <p className="text-center mt-20 text-lg text-red-500">{t("LIVE_NOT_FOUND")}</p>;
 
   const scrollProducts = (direction) => {
     if (productContainerRef.current) {
@@ -65,7 +72,7 @@ export const VideoDisplayPage = () => {
       </div>
 
       {/* Product Section with Scrollable Feature */}
-      <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Products Featured in This Live</h2>
+      <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">{t("PRODUCT_FEATURED")}</h2>
    <div className="relative w-full overflow-hidden p-4 flex items-center">
         {/* Left Scroll Button - Shown when scrolling is needed */}
         {showArrows && (
@@ -93,7 +100,7 @@ export const VideoDisplayPage = () => {
                 </div>
               ))
             ) : (
-              <p className="text-black">No featured products available.</p>
+              <p className="text-black">{t("NO_FEATURE_PRODUCT")}</p>
             )}
           </div>
         

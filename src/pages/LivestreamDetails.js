@@ -2,8 +2,10 @@ import React, { useEffect, useState,useRef } from "react";
 import { useParams,Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const LivestreamDetails = () => {
+  const {t} =useTranslation()
   const { streamId } = useParams();
   const [livestream, setLivestream] = useState(null);
   const scrollRef = useRef(null);
@@ -40,7 +42,7 @@ const LivestreamDetails = () => {
         const updateResponse = await axios.put(`${apiBaseUrl}/api/cart/update/${product._id}`, {
           quantity: updatedQuantity,
         });
-        alert(updateResponse.data.message || 'Product quantity updated in the cart.');
+        alert(updateResponse.data.message || t("PRODUCT_QUANTITY_UPDATED"));
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
@@ -56,14 +58,14 @@ const LivestreamDetails = () => {
             stage: 'AddedToCart',
             quantity: 1,
           });
-          alert(addResponse.data.message || 'Product added to the cart.');
+          alert(addResponse.data.message || t("PRODUCT_ADDED_TO_CART"));
         } catch (addError) {
           console.error('Error adding product to the cart:', addError);
-          alert('Failed to add product to cart.');
+          alert(t("ADD_TO_CART_FAILED"));
         }
       } else {
         console.error('Error checking cart:', error);
-        alert('Failed to check product in cart.');
+        alert(t("CHECK_CART_FAILED"));
       }
     }
   };
@@ -137,7 +139,7 @@ const LivestreamDetails = () => {
                 onClick={() => handleAddToCart(product)}
                 disabled={product.stock === "Out Of Stock"}
               >
-                Add to Cart
+                {t("ADD_TO_CART")}
               </button>
             </div>
           </div>

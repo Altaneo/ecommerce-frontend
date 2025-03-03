@@ -22,11 +22,16 @@ import { AuthProvider } from './context/AuthContext';
 import {VideoDisplayPage} from './pages/VideoDisplayPage';
 import Dashboard from './components/Dashboard';
 import ManualLiveStream from './pages/ManualLiveStream';
+import { useTranslation } from "react-i18next";
+import "./i18n";
 function App() {
+  const { t, i18n } = useTranslation();
+
   return (
     <AuthProvider>
     <Router>
       <Navbar />
+     
       <Routes>
         <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={<LandingPage />} />

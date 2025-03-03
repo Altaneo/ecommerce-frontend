@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import ProductCard from "./ProductCard";
+import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
+  const {t}=useTranslation()
   const { broadcastId } = useParams();
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
@@ -64,7 +66,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-center">Loading...</div>
+        <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -72,14 +74,14 @@ const Dashboard = () => {
   if (status === "complete") {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-center text-lg font-semibold">Live stream Over</div>
+        <div className="text-center text-lg font-semibold">{t("LIVE_STREAM_DASHBOARD")}</div>
       </div>
     );
   }
 
   return (
     <div className="p-4 md:p-6 mt-16">
-      <h1 className="text-xl md:text-2xl font-bold mb-4 text-center">Live Stream Dashboard</h1>
+      <h1 className="text-xl md:text-2xl font-bold mb-4 text-center">{t("LIVE_STREAM_DASHBOARD")}</h1>
       
       <div className="flex flex-col md:flex-row gap-4">
         {/* Video Section */}

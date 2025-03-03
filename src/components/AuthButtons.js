@@ -6,6 +6,7 @@ import { auth, googleProvider, facebookProvider } from './firebaseConfig';
 import axios from 'axios';
 import { makeStyles } from '@mui/styles';
 import SignInButton from './PhoneSignUp';
+import { t } from 'i18next';
 const useStyles = makeStyles({
   buttonContainer: {
     display: 'flex',
@@ -44,7 +45,7 @@ const AuthButtons = ({ onClose }) => {
       const response = await axios.post(`${apiBaseUrl}/api/auth/verifyAuth-token`, { idToken }, { withCredentials: true });
 
       if (response.data.success) {
-        alert('Now You are redirected to youtube login');
+        alert(t("NOW_REDIRECT_YOUTUBE"));
         window.location.href =`${apiBaseUrl}/auth/youtube`
         onClose()
       } else {
@@ -62,15 +63,15 @@ const AuthButtons = ({ onClose }) => {
       const response = await axios.post(`${apiBaseUrl}/api/auth/verifyAuth-token`, { idToken }, { withCredentials: true });
 
       if (response.data.success) {
-        alert('Now You are redirected to youtube login');
+        alert(t("NOW_REDIRECT_YOUTUBE"));
         window.location.href =`${apiBaseUrl}/auth/youtube`
         onClose();
       } else {
-        alert('Login failed.');
+        alert(t("LOGIN_FAILED"));
       }
     } catch (error) {
-      console.error('Error with Facebook login:', error);
-      alert('Login failed.');
+
+      alert(t("LOGIN_FAILED"));
     }
   };
   return (
@@ -98,7 +99,7 @@ const AuthButtons = ({ onClose }) => {
             />
           </svg>
         </div>
-        <span className="ml-4">Sign Up with Google</span>
+        <span className="ml-4">{t("SIGN_UP_WITH_GOOGLE")}</span>
       </button>
       <button onClick={handleFacebookLogin}
         className="w-full flex items-center justify-center h-12 bg-blue-100 text-gray-800 rounded-lg shadow hover:shadow-lg transition mt-4">
@@ -110,7 +111,7 @@ const AuthButtons = ({ onClose }) => {
             />
           </svg>
         </div>
-        <span className="ml-4">Login with Facebook</span>
+        <span className="ml-4">{t("SIGN_UP_WITH_FACEBOOK")}</span>
       </button>
     </>
   );

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import messageService from "../services/messageService";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const ChatComponent = () => {
+  const {t} =useTranslation()
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [socket, setSocket] = useState(null);
@@ -87,7 +89,7 @@ const ChatComponent = () => {
     <>
       <div className="p-4 bg-white shadow-md">
         <h1 className="text-xl font-semibold text-gray-800 mb-2">
-          Chat with Admin
+          {t("CHAT_WITH_ADMIN")}
         </h1>
       </div>
 
@@ -118,19 +120,19 @@ const ChatComponent = () => {
               className="flex-1 px-4 py-2 border rounded-lg"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
+              placeholder={t("MESSAGE_TYPE")}
             />
             <button
               className="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800"
               onClick={sendMessage}
             >
-              Send
+              {t("SEND")}
             </button>
           </div>
         </div>
       ) : (
         <div className="flex-1 flex items-center justify-center text-gray-600">
-          Loading chat...
+          {t("LOADING_CHAT")}
         </div>
       )}
     </>

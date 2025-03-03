@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import axios from "axios";
 import { AiOutlineClose } from "react-icons/ai";
 import AuthButtons from "./AuthButtons";
+import { useTranslation } from "react-i18next";
 
 function AuthModal({ open, onClose, authType }) {
+  const { t } = useTranslation();
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -17,7 +19,8 @@ function AuthModal({ open, onClose, authType }) {
   axios.defaults.withCredentials = true;
   const [userExists, setUserExists] = useState(null);
   const [isUserInfoVisible, setIsUserInfoVisible] = useState(false);
-  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+  const apiBaseUrl =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
   const isPhone = (value) => /^[0-9]{10}$/.test(value);
 
   const handleSubmit = async (e) => {
@@ -31,15 +34,15 @@ function AuthModal({ open, onClose, authType }) {
       return phoneRegex.test(phone);
     };
     if (!emailOrPhone) {
-      alert("Email or phone number is required.");
+      alert(`${t("ALERT_EMAIL_OR_PHONE_REQUIRED")}`);
       return;
     }
     if (!validateEmail(emailOrPhone) && !validatePhone(emailOrPhone)) {
-      alert("Please enter a valid email or phone number.");
+      alert(`${t("ALERT_INVALID_EMAIL_OR_PHONE")}`);
       return;
     }
     if (isOtpSent && (!otp || otp.length !== 6)) {
-      setOtpError("Please enter a valid 6-digit OTP.");
+      setOtpError(`${t("ALERT_INVALID_OTP")}`);
       return;
     }
     if (!isOtpSent) {
@@ -62,14 +65,14 @@ function AuthModal({ open, onClose, authType }) {
           if (otpResponse.status === 200) {
             setIsOtpSent(true);
           } else {
-            alert("Failed to send OTP.");
+            alert(`${t("ALERT_INVALID_OTP")}`);
           }
         } else {
           setUserExists(false);
           setIsUserInfoVisible(true);
         }
       } catch (error) {
-        alert("Error sending OTP. Please try again.");
+        alert(`${t("ALERT_OTP_SENT_FAILED")}`);
         console.error(error);
       }
     } else {
@@ -80,14 +83,14 @@ function AuthModal({ open, onClose, authType }) {
         });
 
         if (response.data.success) {
-          console.log(`${authType} successful! Now You are redirected to youtube login`);
+          console.log(`${authType} ${t("YOUTUBE_REDIRECT_MESSAGE")}`);
           window.location.href = `${apiBaseUrl}/auth/youtube`;
           onClose();
         } else {
-          setOtpError(response.data.message || "Invalid OTP");
+          setOtpError(response.data.message || `${t("INVALID_OTP")}`);
         }
       } catch (error) {
-        setOtpError("Error verifying OTP. Please try again.");
+        setOtpError(`${t("ALERT_OTP_VERIFICATION_ERROR")}`);
         console.error(error);
       }
     }
@@ -118,7 +121,7 @@ function AuthModal({ open, onClose, authType }) {
         userInfoData
       );
       if (saveUserResponse.status === 201) {
-        alert("User saved and OTP sent");
+        alert(`${t("USER_SAVED_AND_OTP_SENT")}`);
         const otpResponse = await axios.post(
           `${apiBaseUrl}/api/auth/send-otp`,
           {
@@ -129,13 +132,13 @@ function AuthModal({ open, onClose, authType }) {
         if (otpResponse.status === 200) {
           setIsOtpSent(true);
         } else {
-          alert("Failed to send OTP.");
+          alert(`${t("FAILED")}`);
         }
       } else {
-        alert("Failed to save user.");
+        alert(`${t("FAILED")}`);
       }
     } catch (error) {
-      alert("Error saving user or sending OTP. Please try again.");
+      alert(`${t("ALERT_ERROR_SENDING_OTP")}`);
       console.error(error);
     }
   };
@@ -149,28 +152,24 @@ function AuthModal({ open, onClose, authType }) {
       formData.append("profilePicture", file);
 
       try {
-        const response = await axios.post(
-          `${apiBaseUrl}/upload`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const response = await axios.post(`${apiBaseUrl}/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
         if (response.data.success) {
           setUserInfo((prev) => ({
             ...prev,
             profilePicture: response.data.imageUrl, // Save the image URL
           }));
-          alert("Image uploaded successfully!");
+          alert(`${t("IMAGE_UPLODED")}`);
         } else {
-          alert("Failed to upload image.");
+          alert(`${t("FAILED_TO_UPLOAD")}`);
         }
       } catch (error) {
         console.error("Error uploading image:", error);
-        alert("Failed to upload image.");
+        alert(`${t("FAILED_TO_UPLOAD")}`);
       }
     }
   };
@@ -179,7 +178,7 @@ function AuthModal({ open, onClose, authType }) {
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center p-4 z-50">
       <div class="bg-white rounded-lg shadow-lg w-full sm:w-96 md:w-1/2 lg:w-2/3 xl:w-1/2">
         <div className="flex justify-between items-center border-b p-4">
-          <h2 className="text-xl font-bold">Welcome to Altaneofin</h2>
+          <h2 className="text-xl font-bold">{t("WELCOME_TO_ALTANEOFIN")}</h2>
           <button
             onClick={onClose}
             className="text-gray-600 hover:text-gray-900"
@@ -189,28 +188,36 @@ function AuthModal({ open, onClose, authType }) {
         </div>
         <div className="overflow-y-auto max-h-[80vh] p-4">
           <div className="flex items-center mb-4">
-            <img src="/images/login.jpg" alt="Logo" className="w-full h-auto object-cover rounded-full" />
+            <img
+              src={`${apiBaseUrl}/uploads/login.jpg`}
+              alt="Logo"
+              className="w-full h-auto object-cover rounded-full"
+            />
           </div>
 
           <div>
             <AuthButtons onClose={onClose} />
             <div className="my-6 flex items-center">
               <div className="flex-grow border-t border-gray-300"></div>
-              <span className="px-4 text-sm text-gray-600">Or sign up with email</span>
+              <span className="px-4 text-sm text-gray-600">
+                {t("OR_SIGN_UP_WITH_EMAIL")}
+              </span>
               <div className="flex-grow border-t border-gray-300"></div>
             </div>
 
             <input
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500 mb-4"
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("ENTER_YOUR_EMAIL")}
               value={emailOrPhone}
               onChange={(e) => setEmailOrPhone(e.target.value)}
             />
             {userExists === false && isUserInfoVisible && (
               <div className="p-2">
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t("PROFILE_PICTURE")}
+                  </label>
                   <input
                     type="file"
                     accept="image/*"
@@ -222,14 +229,16 @@ function AuthModal({ open, onClose, authType }) {
                   <input
                     type="text"
                     name="name"
-                    placeholder="Full Name"
+                    placeholder={t("FULL_NAME")}
                     value={userInfo.name}
                     onChange={handleUserInfoChange}
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
                   />
                 </div>
                 <fieldset className="mb-4">
-                  <legend className="block text-sm font-medium text-gray-700">Role</legend>
+                  <legend className="block text-sm font-medium text-gray-700">
+                    {t("ROLE")}
+                  </legend>
                   <div className="flex space-x-4 mt-2">
                     {["influencer", "customer", "admin"].map((role) => (
                       <label key={role} className="inline-flex items-center">
@@ -241,13 +250,17 @@ function AuthModal({ open, onClose, authType }) {
                           onChange={handleUserInfoChange}
                           className="text-purple-600 border-gray-300 focus:ring-purple-500"
                         />
-                        <span className="ml-2">{role.charAt(0).toUpperCase() + role.slice(1)}</span>
+                        <span className="ml-2">
+                          {t(`ROLE_${role.toUpperCase()}`)}
+                        </span>
                       </label>
                     ))}
                   </div>
                 </fieldset>
                 <fieldset className="mb-4">
-                  <legend className="block text-sm font-medium text-gray-700">Gender</legend>
+                  <legend className="block text-sm font-medium text-gray-700">
+                    {t("GENDER")}
+                  </legend>
                   <div className="flex space-x-4 mt-2">
                     <label className="inline-flex items-center">
                       <input
@@ -258,7 +271,7 @@ function AuthModal({ open, onClose, authType }) {
                         onChange={handleUserInfoChange}
                         className="text-purple-600 border-gray-300 focus:ring-purple-500"
                       />
-                      <span className="ml-2">Male</span>
+                      <span className="ml-2">{t("MALE")}</span>
                     </label>
                     <label className="inline-flex items-center">
                       <input
@@ -269,7 +282,7 @@ function AuthModal({ open, onClose, authType }) {
                         onChange={handleUserInfoChange}
                         className="text-purple-600 border-gray-300 focus:ring-purple-500"
                       />
-                      <span className="ml-2">Female</span>
+                      <span className="ml-2">{t("FEMALE")}</span>
                     </label>
                   </div>
                 </fieldset>
@@ -285,53 +298,61 @@ function AuthModal({ open, onClose, authType }) {
                     pattern="[0-9]*"
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
                   />
-                  <p className="mt-2 text-sm text-gray-500">Enter a valid 10-digit phone number.</p>
+                  <p className="mt-2 text-sm text-gray-500">
+                    {t("ENTER_VALID_PHONE")}
+                  </p>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">Invite Code</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t("INVITE_CODE")}
+                  </label>
                   <input
                     type="text"
                     name="inviteCode"
-                    placeholder="Invite Code"
+                    placeholder={t("INVITE_CODE")}
                     value={userInfo.inviteCode}
                     onChange={handleUserInfoChange}
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
                   />
                 </div>
-
                 <button
                   onClick={handleSaveUserAndSendOtp}
                   className="w-full mt-2 text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800"
                 >
-                  Send OTP
+                  {t("SEND_OTP")}
                 </button>
               </div>
             )}
-
             {isOtpSent && (
               <input
                 className="w-full px-4 py-2 mt-4 border rounded-lg focus:outline-none focus:border-purple-500"
                 type="text"
-                placeholder="Enter OTP"
+                placeholder={t("ENTER_OTP")}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
               />
             )}
-            {otpError && <p className="text-red-500 text-sm mt-2">{otpError}</p>}
+            {otpError && (
+              <p className="text-red-500 text-sm mt-2">{otpError}</p>
+            )}
 
             <button
               onClick={handleSubmit}
               className="w-full mt-4 text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-purple-800"
             >
-              Continue
+              {t("CONTINUE")}
             </button>
 
             <p className="mt-6 text-sm text-gray-600 text-center">
-              By signing up, you agree to our
-              <a href="#" className="text-purple-500 underline ml-1">Terms of Service</a>
-              and
-              <a href="#" className="text-purple-500 underline ml-1">Privacy Policy</a>
+              {t("TERMS_AND_PRIVACY")}
+              <a href="#" className="text-purple-500 underline ml-1">
+                {t("TERMS_OF_SERVICES")}
+              </a>
+              {t("AND")}
+              <a href="#" className="text-purple-500 underline ml-1">
+                {t("PRIVACY_POLICY")}
+              </a>
             </p>
           </div>
         </div>

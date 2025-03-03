@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 const ProfileLayout = () => {
+  const {t} =useTranslation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="flex flex-col md:flex-row mt-24 bg-purple-50 min-h-screen">
       <div className="relative md:hidden flex justify-between items-center p-4 bg-white shadow-md border-b border-purple-800">
-        <h2 className="text-lg font-bold text-purple-600">Profile</h2>
+        <h2 className="text-lg font-bold text-purple-600">{t("PROFILE")}</h2>
         <button
           className="text-purple-600 text-2xl"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -25,7 +27,7 @@ const ProfileLayout = () => {
         `}
       >
         <h2 className="text-lg font-bold text-purple-600 mb-4 text-center">
-          Profile
+          {t("PROFILE")}
         </h2>
         <hr className="border-purple-800 mb-2" />
         <div className="mb-8">
@@ -37,9 +39,9 @@ const ProfileLayout = () => {
         </div>
         <nav className="flex flex-col gap-2">
           {[
-            { to: "/profile/user-details", label: "User Details" },
-            { to: "/profile/my-orders", label: "My Orders" },
-            { to: "/profile/notifications", label: "Notifications" },
+            { to: "/profile/user-details", label: `${t("USER_DEATILS")}` },
+            { to: "/profile/my-orders", label: `${t("MY_ORDERS")}` },
+            { to: "/profile/notifications", label:`${t("NOTIFICATIONS")}`},
           ].map((link) => (
             <NavLink
               key={link.to}

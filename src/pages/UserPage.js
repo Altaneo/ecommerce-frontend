@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import LiveStreamCard from "../components/LiveStreamCard";
+import { useTranslation } from "react-i18next";
 
 const UserPage = () => {
     const { id } = useParams();
+    const { t ,i18n} = useTranslation();
+    const currentLang = i18n.language || "en";
     const [influencer, setInfluencer] = useState(null);
     const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
     
@@ -45,7 +48,7 @@ const UserPage = () => {
                 {/* Right - Influencer Info */}
                 <div className="flex-1">
                     <h1 className="text-3xl font-bold">{influencer.user.name}</h1>
-                    <p className="text-gray-600 mt-2">{influencer.user.bio || "No bio available"}</p>
+                    <p className="text-gray-600 mt-2">{influencer.user.bio || `${t("NO_BIO")}}`}</p>
 
                     {/* Social Media Links */}
                     <div className="flex gap-4 mt-4">
@@ -70,15 +73,18 @@ const UserPage = () => {
 
             {/* Video Section */}
             <div className="mt-8">
-                <h2 className="text-xl font-semibold border-b pb-2">Videos</h2>
+                <h2 className="text-xl font-semibold border-b pb-2">{t("VIDEOS")}</h2>
                 {influencer.livestreams && influencer.livestreams.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
                         {influencer.livestreams.map((video) => (
-                          <LiveStreamCard stream={video} apiBaseUrl={apiBaseUrl}/>
+                          <LiveStreamCard stream={video} apiBaseUrl={apiBaseUrl}  link={`/video/${
+                            video.streamId
+                          }`}/>
+
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-600 mt-4">No videos available.</p>
+                    <p className="text-gray-600 mt-4">{t("NO_VIDEO")}</p>
                 )}
             </div>
         </div>

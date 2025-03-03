@@ -2,15 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import ProductCard from "./ProductCard";
+import { useTranslation } from "react-i18next";
 
 function ProductFilter({ products, categories }) {
+  const {t}=useTranslation()
   const [isVisible, setIsVisible] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
   const [isRatingsOpen, setIsRatingsOpen] = useState(false);
   const formatCategories = (category) => {
-    // Your formatting function for categories
     return category.charAt(0).toUpperCase() + category.slice(1);
   };
   const [filters, setFilters] = useState({
@@ -57,50 +58,6 @@ function ProductFilter({ products, categories }) {
       !filters.rating || product.rating >= parseInt(filters.rating, 10);
     return categoryMatch && priceMatch && ratingMatch;
   });
-
-  const handleAddToCart = async (product) => {
-    try {
-      const existingItemResponse = await axios.get(
-        `${apiBaseUrl}/api/cart/${product._id}`
-      );
-      const existingItem = existingItemResponse.data;
-      if (existingItem) {
-        const updatedQuantity = existingItem.quantity + 1;
-        const updateResponse = await axios.put(
-          `${apiBaseUrl}/api/cart/update/${product._id}`,
-          {
-            quantity: updatedQuantity,
-          }
-        );
-        alert(
-          updateResponse.data.message || "Product quantity updated in the cart."
-        );
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        try {
-          const addResponse = await axios.post(`${apiBaseUrl}/api/cart/add`, {
-            productId: product._id,
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            image: product.image,
-            type: product.type,
-            rating: product.rating,
-            stage: "AddedToCart",
-            quantity: 1,
-          });
-          alert(addResponse.data.message || "Product added to the cart.");
-        } catch (addError) {
-          console.error("Error adding product to the cart:", addError);
-          alert("Failed to add product to cart.");
-        }
-      } else {
-        console.error("Error checking cart:", error);
-        alert("Failed to check product in cart.");
-      }
-    }
-  };
   return (
     <div className="p-5 mt-24">
       <div className="block md:hidden">
@@ -108,7 +65,7 @@ function ProductFilter({ products, categories }) {
           className="bg-purple-800 text-white p-4 rounded-lg flex justify-between items-center cursor-pointer"
           onClick={() => setIsFilterOpen(!isFilterOpen)}
         >
-          <span className="text-xl font-bold">Filter</span>
+          <span className="text-xl font-bold">{t("FILTER")}</span>
           <span>{isFilterOpen ? "-" : "+"}</span>
         </div>
         {isFilterOpen && (
@@ -117,7 +74,7 @@ function ProductFilter({ products, categories }) {
               <div className="mb-8">
                 <img
                   src="/images/sideImage.png"
-                  alt="Sidebar Banner"
+                  alt={t("SIDEBAR_BANNER")}
                   className="w-full h-auto rounded-lg"
                 />
               </div>
@@ -125,7 +82,7 @@ function ProductFilter({ products, categories }) {
                 className="font-bold mb-2 cursor-pointer flex justify-between items-center"
                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
               >
-                CATEGORIES
+                {t("CATEGORIES")}
                 <span className="text-purple-800">
                   {isCategoriesOpen ? "-" : "+"}
                 </span>
@@ -170,7 +127,7 @@ function ProductFilter({ products, categories }) {
                 className="font-bold mb-2 cursor-pointer flex justify-between items-center"
                 onClick={() => setIsPriceOpen(!isPriceOpen)}
               >
-                PRICE
+                 {t("PRICE")}
                 <span className="text-purple-800">
                   {isPriceOpen ? "-" : "+"}
                 </span>
@@ -189,9 +146,9 @@ function ProductFilter({ products, categories }) {
                       }));
                     }}
                     className="border border-purple-800 rounded-lg p-2 w-28"
-                    placeholder="Min"
+                    placeholder={t("MIN")}
                   />
-                  <span className="mx-2">to</span>
+                  <span className="mx-2">{t("TO")}</span>
                   <input
                     type="number"
                     value={filters.priceRange[1]}
@@ -206,7 +163,7 @@ function ProductFilter({ products, categories }) {
                       }));
                     }}
                     className="border border-purple-800 rounded-lg p-2 w-28"
-                    placeholder="Max"
+                    placeholder={t("MAX")}
                   />
                 </div>
               )}
@@ -218,7 +175,7 @@ function ProductFilter({ products, categories }) {
                 className="font-bold mb-2 cursor-pointer flex justify-between items-center"
                 onClick={() => setIsRatingsOpen(!isRatingsOpen)}
               >
-                Customer Ratings
+                {t("CUSTOMER_RATING")}
                 <span className="text-purple-800">
                   {isRatingsOpen ? "-" : "+"}
                 </span>
@@ -241,7 +198,7 @@ function ProductFilter({ products, categories }) {
                         readOnly
                         className="mr-2"
                       />
-                      <label className="text-black">{rating}★ & above</label>
+                      <label className="text-black">{rating}★ & {t("ABOVE")}</label>
                     </div>
                   ))}
                 </div>
@@ -253,13 +210,13 @@ function ProductFilter({ products, categories }) {
 
       <div className="flex gap-5">
       <div className="hidden md:block bg-white text-black p-4 rounded-lg w-72 border border-purple-800 h-screen sticky top-0 overflow-y-auto">
-          <div className="font-bold mb-2 text-4xl text-center">Filter</div>
+          <div className="font-bold mb-2 text-4xl text-center">{t("FILTER")}</div>
           <hr className="border-purple-800 mb-2" />
           <div className="mb-5">
             <div className="mb-8">
               <img
                 src="/images/sideImage.png"
-                alt="Sidebar Banner"
+                alt={t("SIDEBAR_BANNER")}
                 className="w-full h-auto rounded-lg"
               />
             </div>
@@ -267,7 +224,7 @@ function ProductFilter({ products, categories }) {
               className="font-bold mb-2 cursor-pointer flex justify-between items-center"
               onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
             >
-              CATEGORIES
+              {t("CATEGORIES")}
               <span className="text-purple-800">
                 {isCategoriesOpen ? "-" : "+"}
               </span>
@@ -296,7 +253,7 @@ function ProductFilter({ products, categories }) {
                       className="mr-2"
                     />
                     <label className="text-black">
-                      {formatCategories(category)}
+                      {t(formatCategories(category).toUpperCase())}
                     </label>
                   </div>
                 ))}
@@ -310,7 +267,7 @@ function ProductFilter({ products, categories }) {
               className="font-bold mb-2 cursor-pointer flex justify-between items-center"
               onClick={() => setIsPriceOpen(!isPriceOpen)}
             >
-              PRICE
+              {t("PRICE")}
               <span className="text-purple-800">{isPriceOpen ? "-" : "+"}</span>
             </div>
             <hr className="border-purple-800 mb-2" />
@@ -327,7 +284,7 @@ function ProductFilter({ products, categories }) {
                     }));
                   }}
                   className="border border-purple-800 rounded-lg p-2 w-28"
-                  placeholder="Min"
+                  placeholder={t("MIN")}
                 />
                 <span className="mx-2">to</span>
                 <input
@@ -344,7 +301,7 @@ function ProductFilter({ products, categories }) {
                     }));
                   }}
                   className="border border-purple-800 rounded-lg p-2 w-28"
-                  placeholder="Max"
+                  placeholder={t("MAX")}
                 />
               </div>
             )}
@@ -356,7 +313,7 @@ function ProductFilter({ products, categories }) {
               className="font-bold mb-2 cursor-pointer flex justify-between items-center"
               onClick={() => setIsRatingsOpen(!isRatingsOpen)}
             >
-              Customer Ratings
+              {t("CUSTOMER_RATING")}
               <span className="text-purple-800">
                 {isRatingsOpen ? "-" : "+"}
               </span>
@@ -377,7 +334,7 @@ function ProductFilter({ products, categories }) {
                       readOnly
                       className="mr-2"
                     />
-                    <label className="text-black">{rating}★ & above</label>
+                    <label className="text-black">{rating}★ & {t("ABOVE")}</label>
                   </div>
                 ))}
               </div>
@@ -393,12 +350,12 @@ function ProductFilter({ products, categories }) {
                   <ProductCard
                     imageUrl={product.image}
                     product={product}
-                    index={index}
+                    key={index}
                     isVisible={isVisible}
                   />
                 ))
               ) : (
-                <p className="text-gray-500">No products found.</p>
+                <p className="text-gray-500">{t("NO_PRODUCTS_FOUND")}</p>
               )}
             </div>
           </div>

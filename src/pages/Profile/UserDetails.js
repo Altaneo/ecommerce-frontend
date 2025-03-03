@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const UserDetails = () => {
-  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+  const apiBaseUrl =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+  const { t ,i18n} = useTranslation();
+  const currentLang = i18n.language || "en";
   const [userData, setUserData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -10,14 +14,14 @@ const UserDetails = () => {
   const [image, setImage] = useState("");
   const [success, setSuccess] = useState("");
   const [addressData, setAddressData] = useState({
-    pincode: '',
-    locality: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    landmark: '',
-    alternatePhone: '',
-    addressType: 'Home',
+    pincode: "",
+    locality: "",
+    streetAddress: "",
+    city: "",
+    state: "",
+    landmark: "",
+    alternatePhone: "",
+    addressType: "Home",
   });
   const fetchUserDataRef = useRef(false);
 
@@ -36,22 +40,25 @@ const UserDetails = () => {
         withCredentials: true,
       });
       setUserData(response.data.user);
-      if (response.data.user.addresses && response.data.user.addresses.length > 0) {
+      if (
+        response.data.user.addresses &&
+        response.data.user.addresses.length > 0
+      ) {
         setAddressData(response.data.user.addresses[0]);
       } else {
         setAddressData({
-          pincode: '',
-          locality: '',
-          streetAddress: '',
-          city: '',
-          state: '',
-          landmark: '',
-          alternatePhone: '',
-          addressType: 'Home',
+          pincode: "",
+          locality: "",
+          streetAddress: "",
+          city: "",
+          state: "",
+          landmark: "",
+          alternatePhone: "",
+          addressType: "Home",
         });
       }
     } catch (error) {
-      setError("Failed to fetch user data.");
+      setError(t("FAILED_TO_FETCH_USER"));
     } finally {
       fetchUserDataRef.current = false;
     }
@@ -62,29 +69,24 @@ const UserDetails = () => {
       const formData = new FormData();
       formData.append("profilePicture", file);
       try {
-        const response = await axios.post(
-          `${apiBaseUrl}/upload`, 
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-  
+        const response = await axios.post(`${apiBaseUrl}/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
         if (response.data.success) {
-          setImage(response.data.imageUrl)
+          setImage(response.data.imageUrl);
           setUserData((prev) => ({
             ...prev,
             profilePicture: image, // Save the image URL
           }));
-          alert("Image uploaded successfully!");
+          alert(t("IMAGE_UPLOADED"));
         } else {
-          alert("Failed to upload image.");
+          alert(t("FAILED_TO_UPLOADED"));
         }
       } catch (error) {
-        console.error("Error uploading image:", error);
-        alert("Failed to upload image.");
+        alert(t("FAILED_TO_UPLOADED"));
       }
     }
   };
@@ -98,26 +100,26 @@ const UserDetails = () => {
         {
           name: userData.name,
           uid: userData._id,
-          bio:userData.bio,
+          bio: userData.bio,
           gender: userData.gender,
           role: userData.role,
           email: userData.email,
           phone: userData.phone,
-          profilePicture:image,
+          profilePicture: image,
           addresses: [addressData],
         },
         { withCredentials: true }
       );
-      setSuccess("Profile updated successfully!");
+      setSuccess(t("PROFILE_UPDATE_SUCCESS"));
       setUserData(response.data.user);
       setIsEditing(false);
     } catch (error) {
-      setError("Failed to update profile. Please try again.");
+      setError(t("FAILED_TO_UPDATE_PROFILE"));
     } finally {
       setLoading(false);
     }
   };
-  const handleChange = (e) => { 
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
@@ -129,17 +131,10 @@ const UserDetails = () => {
   return (
     <>
       <h2 className="text-4xl mt-4 mb-2 flex justify-center font-bold text-black animate-slide-in whitespace-nowrap">
-
-        User Details
+        {t("USER_DEATILS")}
       </h2>
       <div className="flex mt-4 items-center justify-center  bg-purple-50 p-5">
-
         <div className="max-w-3xl w-full bg-white shadow-lg rounded-lg p-6">
-
-
-          {error && <p className="text-red-500">{error}</p>}
-          {success && <p className="text-purple-500">{success}</p>}
-
           {!loading ? (
             <>
               <div className="space-y-5">
@@ -151,7 +146,7 @@ const UserDetails = () => {
                         name="name"
                         value={userData.name || ""}
                         onChange={handleChange}
-                        placeholder="First Name"
+                        placeholder={t("FULL_NAME")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                       />
                     </div>
@@ -161,12 +156,12 @@ const UserDetails = () => {
                         name="bio"
                         value={userData.bio || ""}
                         onChange={handleChange}
-                        placeholder="Bio"
+                        placeholder={t("BIO")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                       />
                     </div>
                     <div>
-                      <label className="block mb-2">Gender</label>
+                      <label className="block mb-2">{t("GENDER")}</label>
                       <div className="flex space-x-4">
                         <label>
                           <input
@@ -176,7 +171,7 @@ const UserDetails = () => {
                             checked={userData.gender === "Male"}
                             onChange={handleChange}
                           />
-                          Male
+                          {t("MALE")}
                         </label>
                         <label>
                           <input
@@ -186,12 +181,12 @@ const UserDetails = () => {
                             checked={userData.gender === "Female"}
                             onChange={handleChange}
                           />
-                          Female
+                          {t("FEMALE")}
                         </label>
                       </div>
                     </div>
                     <div>
-                      <label className="block mb-2">Role</label>
+                      <label className="block mb-2">{t("ROLE")}</label>
                       <div className="flex space-x-4">
                         <label>
                           <input
@@ -201,7 +196,7 @@ const UserDetails = () => {
                             checked={userData.role === "influencer"}
                             onChange={handleChange}
                           />
-                          influencer
+                          {t("INFLUENCER")}
                         </label>
                         <label>
                           <input
@@ -211,7 +206,7 @@ const UserDetails = () => {
                             checked={userData.role === "customer"}
                             onChange={handleChange}
                           />
-                          Customer
+                          {t("CUSTOMER")}
                         </label>
                       </div>
                     </div>
@@ -221,7 +216,7 @@ const UserDetails = () => {
                         name="email"
                         value={userData.email || ""}
                         onChange={handleChange}
-                        placeholder="Email"
+                        placeholder={t("EMAIL_ADDRESS")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                       />
                     </div>
@@ -231,12 +226,12 @@ const UserDetails = () => {
                         name="phone"
                         value={userData.phone || ""}
                         onChange={handleChange}
-                        placeholder="Phone"
+                        placeholder={t("PHONE")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                         maxLength="10"
                       />
                     </div>
-                    <label className="block mb-2">Profile Picture</label>
+                    <label className="block mb-2">{t("PROFILE_PICTURE")}</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -249,7 +244,7 @@ const UserDetails = () => {
                         name="pincode"
                         value={addressData.pincode}
                         onChange={handleAddressChange}
-                        placeholder="Pincode"
+                        placeholder={t("PINCODE")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                         required
                       />
@@ -260,7 +255,7 @@ const UserDetails = () => {
                         name="locality"
                         value={addressData.locality}
                         onChange={handleAddressChange}
-                        placeholder="Locality"
+                        placeholder={t("LOCALITY")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                         required
                       />
@@ -271,7 +266,7 @@ const UserDetails = () => {
                         name="streetAddress"
                         value={addressData.streetAddress}
                         onChange={handleAddressChange}
-                        placeholder="Address (Area and Street)"
+                        placeholder={t("ADDRESS")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                         required
                       />
@@ -283,7 +278,7 @@ const UserDetails = () => {
                         name="city"
                         value={addressData.city}
                         onChange={handleAddressChange}
-                        placeholder="City/District/Town"
+                        placeholder={t("CITY")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                         required
                       />
@@ -294,7 +289,7 @@ const UserDetails = () => {
                         name="state"
                         value={addressData.state}
                         onChange={handleAddressChange}
-                        placeholder="State"
+                        placeholder={t("STATE")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                         required
                       />
@@ -305,23 +300,12 @@ const UserDetails = () => {
                         name="landmark"
                         value={addressData.landmark}
                         onChange={handleAddressChange}
-                        placeholder="Landmark (Optional)"
+                        placeholder={t("LANDMARK")}
                         className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
                       />
                     </div>
                     <div>
-                      <input
-                        type="text"
-                        name="alternatePhone"
-                        value={addressData.alternatePhone}
-                        onChange={handleAddressChange}
-                        placeholder="Alternate Phone (Optional)"
-                        className="w-full border-b-2 border-gray-300 focus:outline-none focus:border-purple-500"
-                        maxLength="10"
-                      />
-                    </div>
-                    <div>
-                      <label className="block mb-2">Address Type</label>
+                      <label className="block mb-2">{t("ADDRESS_TYPE")}</label>
                       <div className="flex space-x-4">
                         <label>
                           <input
@@ -331,7 +315,7 @@ const UserDetails = () => {
                             checked={addressData.addressType === "Home"}
                             onChange={handleAddressChange}
                           />
-                          Home
+                          {t("HOME")}
                         </label>
                         <label>
                           <input
@@ -341,7 +325,7 @@ const UserDetails = () => {
                             checked={addressData.addressType === "Work"}
                             onChange={handleAddressChange}
                           />
-                          Work
+                          {t("WORK")}
                         </label>
                       </div>
                     </div>
@@ -351,17 +335,17 @@ const UserDetails = () => {
                     <div class="bg-white overflow-hidden shadow rounded-lg border">
                       <div class="px-4 py-5 sm:px-6">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">
-                          User Profile
+                          {t("USER_PROFILE")}
                         </h3>
                         <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                          This is some information about the user.
+                          {t("USER_INFO")}
                         </p>
                       </div>
                       <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
                         <dl class="sm:divide-y sm:divide-gray-200">
                           <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">
-                              Full name
+                              {t("FULL_NAME")}:{" "}
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                               {userData.name || "N/A"}
@@ -369,7 +353,7 @@ const UserDetails = () => {
                           </div>
                           <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">
-                              Email address
+                              {t("EMAIL_ADDRESS")}:
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                               {userData.email || "N/A"}
@@ -377,7 +361,7 @@ const UserDetails = () => {
                           </div>
                           <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">
-                              Phone number
+                              {t("PHONE")}:
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                               {userData.phone || "N/A"}
@@ -385,7 +369,7 @@ const UserDetails = () => {
                           </div>
                           <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">
-                              Gender:
+                              {t("GENDER")}:
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                               {userData.gender || "N/A"}
@@ -393,7 +377,7 @@ const UserDetails = () => {
                           </div>
                           <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">
-                              Role:
+                              {t("ROLE")}
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                               {userData.role || "N/A"}
@@ -402,11 +386,13 @@ const UserDetails = () => {
                           {addressData?.city && (
                             <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                               <dt class="text-sm font-medium text-gray-500">
-                                Address
+                                {t("ADDRESS")}
                               </dt>
                               <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-
-                                {userData.name}, {addressData.pincode} ,{addressData.streetAddress}, {addressData.locality}, {addressData.city}, {addressData.state}
+                                {userData.name}, {addressData.pincode} ,
+                                {addressData.streetAddress},{" "}
+                                {addressData.locality}, {addressData.city},{" "}
+                                {addressData.state}
                               </dd>
                             </div>
                           )}
@@ -423,13 +409,13 @@ const UserDetails = () => {
                       className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
                       onClick={handleSubmit}
                     >
-                      Save Changes
+                      {t("SAVE_CHANGES")}
                     </button>
                     <button
                       className="bg-gray-300 text-black px-4 py-2 rounded ml-2 hover:bg-gray-400"
                       onClick={() => setIsEditing(false)}
                     >
-                      Cancel
+                      {t("CANCEL")}
                     </button>
                   </>
                 ) : (
@@ -437,13 +423,15 @@ const UserDetails = () => {
                     className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
                     onClick={() => setIsEditing(true)}
                   >
-                    Edit Profile
+                    {t("EDIT_PROFILE")}
                   </button>
                 )}
               </div>
             </>
           ) : (
-            <p>Loading...</p>
+            <div className="flex items-center justify-center h-screen">
+              <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
           )}
         </div>
       </div>

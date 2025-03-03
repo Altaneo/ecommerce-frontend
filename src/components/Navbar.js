@@ -15,8 +15,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChatComponent from "./Chatbot";
-
+import { useTranslation } from "react-i18next";
+import "../i18n";
+import LanguageIcon from "@mui/icons-material/Language";
 function Navbar() {
+
   const [modalOpen, setModalOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -26,6 +29,9 @@ function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const { t, i18n } = useTranslation();
+  const [anchorEl, setAnchorEl] = useState(null);
+
   const navigate = useNavigate();
   const location = useLocation();
   const apiBaseUrl =
@@ -99,7 +105,17 @@ function Navbar() {
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
+  
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
+  // Close menu & change language
+  const handleClose = (lang) => {
+    i18n.changeLanguage(lang);
+    setAnchorEl(null);
+  };
+console.log(totalQuantity,"-----------totalQuantity.length")
   return (
     <header className="fixed top-0 left-0 right-0 border-2 border-purple-300 rounded-full bg-white shadow-md flex items-center justify-between px-4 md:px-8 py-3 z-50">
       {/* Logo & Menu Button */}
@@ -114,27 +130,28 @@ function Navbar() {
         <ul className="flex items-center space-x-6">
           <li>
             <Link to="/home" className="hover:text-purple-500">
-              Home
+              {t("HOME")}
             </Link>
           </li>
           <li>
             <Link to="/electronics" className="hover:text-purple-500">
-              Electronics
+              
+              {t("ELECTRONICS")}
             </Link>
           </li>
           <li>
             <Link to="/fashion" className="hover:text-purple-500">
-              Fashion
+            {t("FASHION")}
             </Link>
           </li>
           <li>
             <Link to="/beauty" className="hover:text-purple-500">
-              Beauty
+            {t("BEAUTY")}
             </Link>
           </li>
           <li>
             <Link to="/home-goods" className="hover:text-purple-500">
-              Home Goods
+            {t("HOME_GOODS")}
             </Link>
           </li>
         </ul>
@@ -149,7 +166,7 @@ function Navbar() {
           <TextField
             variant="outlined"
             size="small"
-            placeholder="Search..."
+            placeholder={t("SEARCH")}
             value={searchQuery}
             onChange={handleSearchChange}
             className="bg-white rounded-md"
@@ -173,10 +190,10 @@ function Navbar() {
             >
               <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
             </svg>
-            <div className="px-1 py-0.5 bg-blue-500 min-w-5 rounded-full text-center text-white text-xs absolute -top-2 -right-1 translate-x-1/4 text-nowrap">
+            {totalQuantity!==0 && ( <div className="px-1 py-0.5 bg-blue-500 min-w-5 rounded-full text-center text-white text-xs absolute -top-2 -right-1 translate-x-1/4 text-nowrap">
               <div className="absolute top-0 left-0 rounded-full -z-10 animate-ping bg-blue-200 w-full h-full"></div>
               {totalQuantity}
-            </div>
+            </div>)}
           </div>
         </IconButton>
 
@@ -226,6 +243,17 @@ function Navbar() {
             </div>
           </div>
         </IconButton>
+        <IconButton onClick={handleClick}>
+        <LanguageIcon fontSize="large" />
+      </IconButton>
+
+      {/* Dropdown Menu */}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+        <MenuItem onClick={() => handleClose("en")}>English</MenuItem>
+        <MenuItem onClick={() => handleClose("hi")}>हिन्दी</MenuItem>
+        <MenuItem onClick={() => handleClose("ta")}>Tamil</MenuItem>
+        <MenuItem onClick={() => handleClose("g")}>Gujrati</MenuItem>
+      </Menu>
         {isAuthenticated ? (
           <>
             <IconButton onClick={handleProfileMenuOpen}>
@@ -249,8 +277,8 @@ function Navbar() {
               open={Boolean(profileMenuAnchor)}
               onClose={handleProfileMenuClose}
             >
-              <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
-              <MenuItem><Link to="/profile">Profile</Link></MenuItem>
+              <MenuItem onClick={handleSignOut}>{t("SIGN_OUT")}</MenuItem>
+              <MenuItem><Link to="/profile">{t("PROFILE")}</Link></MenuItem>
             </Menu>
           </>
         ) : (
@@ -258,7 +286,7 @@ function Navbar() {
             onClick={() => handleOpenModal("Login")}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg"
           >
-            Login
+            {t("LOGIN")}
           </button>
         )}
       </div>
@@ -317,7 +345,7 @@ function Navbar() {
                   open={Boolean(profileMenuAnchor)}
                   onClose={handleProfileMenuClose}
                 >
-                  <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+                  <MenuItem onClick={handleSignOut}>{t("SIGN_OUT")}</MenuItem>
                 </Menu>
               </div>
             ) : (
@@ -325,7 +353,7 @@ function Navbar() {
                 onClick={() => handleOpenModal("Login")}
                 className="bg-purple-600 text-white px-4 py-2 rounded-lg"
               >
-                Login
+                {t("LOGIN")}
               </button>
             )}
           </div>
@@ -334,7 +362,7 @@ function Navbar() {
             <TextField
               variant="outlined"
               size="small"
-              placeholder="Search..."
+              placeholder={t("SEARCH")}
               value={searchQuery}
               onChange={handleSearchChange}
               className="bg-white rounded-md w-full"
@@ -346,19 +374,19 @@ function Navbar() {
 
           <ul className="space-y-3">
             <li>
-              <Link to="/home">Home</Link>
+              <Link to="/home">{t("HOME")}</Link>
             </li>
             <li>
-              <Link to="/electronics">Electronics</Link>
+              <Link to="/electronics">{t("ELECTRONICS")}</Link>
             </li>
             <li>
-              <Link to="/fashion">Fashion</Link>
+              <Link to="/fashion">{t("FASHION")}</Link>
             </li>
             <li>
-              <Link to="/beauty">Beauty</Link>
+              <Link to="/beauty">{t("BEAUTY")}</Link>
             </li>
             <li>
-              <Link to="/home-goods">Home Goods</Link>
+              <Link to="/home-goods">{t("HOME_GOODS")}</Link>
             </li>
           </ul>
 
